@@ -19,7 +19,7 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { password, ...user } = createUserDto;
     const hashedPassword = await hash(password);
-    return await this.prisma.user.create({
+    return await this.prisma.users.create({
       data: {
         password: hashedPassword,
         ...user,
@@ -28,7 +28,7 @@ export class UsersService {
   }
 
   async findByUsername(username: string): Promise<User | undefined> {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prisma.users.findUnique({
       where: {
         username,
       },
@@ -45,7 +45,7 @@ export class UsersService {
   }
 
   async findByEmail(email: string): Promise<User | undefined> {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prisma.users.findUnique({
       where: {
         email,
       },
@@ -62,7 +62,7 @@ export class UsersService {
   }
 
   async findByUsernameField(username: string): Promise<User | undefined> {
-    const user = await this.prisma.user.findFirst({
+    const user = await this.prisma.users.findFirst({
       where: {
         OR: [
           {
