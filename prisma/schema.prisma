@@ -34,6 +34,9 @@ model items {
   updatedUser Int?
   updatedAt DateTime?
   isDeleted Int @default(0)
+
+  orderItems order_items[] // One item can appear in multiple orders
+  packingScans packing_scans_list[] // One item can appear in multiple packing scans
 }
 
 model orders {
@@ -45,5 +48,49 @@ model orders {
   updatedUser Int?
   updatedAt DateTime?
   isDeleted Int @default(0)
+
+  orderItems order_items[] // One order has many items
+  packingProofs packing_proofs[] // One order has many packing proofs
+  packingScans packing_scans_list[] // One order has many packing scans
+}
+
+model order_items {
+  id Int @default(autoincrement()) @id
+  orderId Int
+  itemId Int
+  quantity Int
+
+  order orders @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  item  items  @relation(fields: [itemId], references: [id], onDelete: Cascade)
+}
+
+model packing_proofs {
+  id Int @default(autoincrement()) @id
+  orderId Int
+  video String
+  station String
+  startTime DateTime
+  finishTime DateTime?
+  isSuccessfully Int @default(0) // 0: not yet, 1: finsihed, 2: packing, 3: packing failed
+  createdAt DateTime @default(now())
+  updatedAt DateTime?
+  isDeleted Int @default(0)
+
+  order orders @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  packingScans packing_scans_list[] // One proof has many scans
+}
+
+model packing_scans_list {
+  id Int @default(autoincrement()) @id
+  packingProofId Int
+  orderId Int
+  itemId Int
+  scannedQuantity Int
+  scannedAt DateTime @default(now())
+  isDeleted Int @default(0)
+
+  order orders @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  item items @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  packingProof packing_proofs? @relation(fields: [packingProofId], references: [id], onDelete: Cascade)
 }
 
