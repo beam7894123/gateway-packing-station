@@ -2,6 +2,7 @@ import { IsString, IsOptional, IsInt, IsNumberString, IsPositive, IsNumber } fro
 import { Transform } from 'class-transformer';
 
 export class ItemDto {
+  @IsOptional()
   @IsString()
   itemCode: string;
 
