@@ -13,9 +13,9 @@ export function getBaseUrl(req: Request): string {
 export const imageUploadInterceptor = (fieldName: string) =>
   FileInterceptor(fieldName, {
     fileFilter: (req, file, callback) => {
-      const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
       if (!allowedMimeTypes.includes(file.mimetype)) {
-        return callback(new BadRequestException('Only image files (JPG, PNG, GIF, WEBP) are allowed! >:<'), false);
+        return callback(new BadRequestException('Only image files (JPG, PNG, GIF) are allowed! >:<'), false); // PLZ ADD WEBP SUPPORT!!! >m< <--------------------------
       }
       callback(null, true);
     },
