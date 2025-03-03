@@ -6,6 +6,7 @@ export class ItemDto {
   @IsString()
   itemCode: string;
 
+  @IsOptional()
   @IsString()
   name: string;
 
