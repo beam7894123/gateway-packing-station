@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,83 +8,77 @@ datasource db {
 }
 
 model users {
-  id    Int     @default(autoincrement()) @id
-  email String  @unique
-  username  String  @unique
-  password String
+  id                 Int     @id @default(autoincrement())
+  email              String  @unique
+  username           String  @unique
+  password           String
   hashedRefreshToken String?
 }
 
 model items {
-  id Int @default(autoincrement()) @id
-  itemCode Int
-  name String
-  description String?
-  price Float?
-  quantity Int @default(0)
-  image String?
-  createdUser Int
-  createdAt DateTime @default(now())
-  updatedUser Int?
-  updatedAt DateTime?
-  isDeleted Int @default(0)
-
-  orderItems order_items[] // One item can appear in multiple orders
-  packingScans packing_scans_list[] // One item can appear in multiple packing scans
+  id           Int                  @id @default(autoincrement())
+  itemCode     String
+  name         String
+  description  String?
+  price        Float?
+  quantity     Int                  @default(0)
+  image        String?
+  createdUser  Int
+  createdAt    DateTime             @default(now())
+  updatedUser  Int?
+  updatedAt    DateTime?
+  isDeleted    Int                  @default(0)
+  orderItems   order_items[]
+  packingScans packing_scans_list[]
 }
 
 model orders {
-  id Int @default(autoincrement()) @id
-  customer String
-  status Int @default(0)
+  id             Int                  @id @default(autoincrement())
+  customer       String
+  status         Int                  @default(0)
   trackingNumber String?
-  createdAt DateTime @default(now())
-  updatedUser Int?
-  updatedAt DateTime?
-  isDeleted Int @default(0)
-
-  orderItems order_items[] // One order has many items
-  packingProofs packing_proofs[] // One order has many packing proofs
-  packingScans packing_scans_list[] // One order has many packing scans
+  createdAt      DateTime             @default(now())
+  updatedUser    Int?
+  updatedAt      DateTime?
+  isDeleted      Int                  @default(0)
+  orderItems     order_items[]
+  packingProofs  packing_proofs[]
+  packingScans   packing_scans_list[]
 }
 
 model order_items {
-  id Int @default(autoincrement()) @id
-  orderId Int
-  itemId Int
+  id       Int    @id @default(autoincrement())
+  orderId  Int
+  itemId   Int
   quantity Int
-
-  order orders @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  item  items  @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  item     items  @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  order    orders @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
 model packing_proofs {
-  id Int @default(autoincrement()) @id
-  orderId Int
-  video String
-  station String
-  startTime DateTime
-  finishTime DateTime?
-  isSuccessfully Int @default(0) // 0: not yet, 1: finsihed, 2: packing, 3: packing failed
-  createdAt DateTime @default(now())
-  updatedAt DateTime?
-  isDeleted Int @default(0)
-
-  order orders @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  packingScans packing_scans_list[] // One proof has many scans
+  id             Int                  @id @default(autoincrement())
+  orderId        Int
+  video          String
+  station        String
+  startTime      DateTime
+  finishTime     DateTime?
+  isSuccessfully Int                  @default(0)
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime?
+  isDeleted      Int                  @default(0)
+  order          orders               @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  packingScans   packing_scans_list[]
 }
 
 model packing_scans_list {
-  id Int @default(autoincrement()) @id
-  packingProofId Int
-  orderId Int
-  itemId Int
+  id              Int            @id @default(autoincrement())
+  packingProofId  Int
+  orderId         Int
+  itemId          Int
   scannedQuantity Int
-  scannedAt DateTime @default(now())
-  isDeleted Int @default(0)
-
-  order orders @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  item items @relation(fields: [itemId], references: [id], onDelete: Cascade)
-  packingProof packing_proofs? @relation(fields: [packingProofId], references: [id], onDelete: Cascade)
+  scannedAt       DateTime       @default(now())
+  isDeleted       Int            @default(0)
+  item            items          @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  order           orders         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  packingProof    packing_proofs @relation(fields: [packingProofId], references: [id], onDelete: Cascade)
 }
-
