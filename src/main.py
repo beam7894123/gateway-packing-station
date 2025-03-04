@@ -2,9 +2,9 @@ import sys
 from PySide6.QtWidgets import QMainWindow, QMessageBox, QApplication
 from PySide6.QtCore import QEvent
 from PySide6.QtGui import QPalette, QColor
-from ui.mainUi import Ui_MainWindow
-from about import AboutPopup
-from camera import CameraSettingPopup
+from views.mainUi import Ui_MainWindow
+from components.about import AboutPopup
+from components.camera import CameraSettingPopup
 
 
 class MainStationWindow(QMainWindow, Ui_MainWindow):
