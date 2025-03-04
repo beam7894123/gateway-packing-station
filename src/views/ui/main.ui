@@ -67,16 +67,16 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QPushButton" name="pushButton_2">
+         <widget class="QPushButton" name="pushButton_test1">
           <property name="text">
-           <string>PushButton</string>
+           <string>TEST1</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="pushButton_test2">
           <property name="text">
-           <string>PushButton</string>
+           <string>TEST2</string>
           </property>
          </widget>
         </item>
@@ -112,6 +112,7 @@
     <property name="title">
      <string>Setting</string>
     </property>
+    <addaction name="actionApiSetting"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSetting"/>
@@ -155,6 +156,11 @@
   <action name="actionCamera">
    <property name="text">
     <string>Camera</string>
+   </property>
+  </action>
+  <action name="actionApiSetting">
+   <property name="text">
+    <string>API</string>
    </property>
   </action>
  </widget>

@@ -1,7 +1,7 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton
+from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton
 from PySide6.QtCore import Qt
 
-class AboutPopup(QWidget):
+class AboutPopup(QDialog):
     def __init__(self):
         super().__init__()
         
@@ -22,7 +22,7 @@ class AboutPopup(QWidget):
         
         # Create Close button
         close_button = QPushButton("Close")
-        close_button.clicked.connect(self.close)
+        close_button.clicked.connect(self.accept)
         
         # Add widgets to layout
         layout.addWidget(about_text)

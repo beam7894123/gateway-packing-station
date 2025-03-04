@@ -4,7 +4,7 @@ from datetime import datetime
 from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QComboBox, QFileDialog, QVBoxLayout
 from PySide6.QtGui import QImage, QPixmap
 from PySide6.QtCore import QTimer
-from views.cameraUi import Ui_cameraWidget
+from views.ui.cameraUi import Ui_cameraWidget
 
 
 def get_available_cameras(max_tested=5):

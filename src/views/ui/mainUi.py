@@ -36,6 +36,8 @@ class Ui_MainWindow(object):
         self.actionStation.setObjectName(u"actionStation")
         self.actionCamera = QAction(MainWindow)
         self.actionCamera.setObjectName(u"actionCamera")
+        self.actionApiSetting = QAction(MainWindow)
+        self.actionApiSetting.setObjectName(u"actionApiSetting")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout_2 = QHBoxLayout(self.centralwidget)
@@ -83,15 +85,15 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.pushButton_2 = QPushButton(self.centralwidget)
-        self.pushButton_2.setObjectName(u"pushButton_2")
+        self.pushButton_test1 = QPushButton(self.centralwidget)
+        self.pushButton_test1.setObjectName(u"pushButton_test1")
 
-        self.horizontalLayout.addWidget(self.pushButton_2)
+        self.horizontalLayout.addWidget(self.pushButton_test1)
 
-        self.pushButton = QPushButton(self.centralwidget)
-        self.pushButton.setObjectName(u"pushButton")
+        self.pushButton_test2 = QPushButton(self.centralwidget)
+        self.pushButton_test2.setObjectName(u"pushButton_test2")
 
-        self.horizontalLayout.addWidget(self.pushButton)
+        self.horizontalLayout.addWidget(self.pushButton_test2)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout)
@@ -124,6 +126,7 @@ class Ui_MainWindow(object):
         self.menuFile.addAction(self.actionExit)
         self.menuHelp.addAction(self.actionAbout)
         self.menuHelp.addAction(self.actionAboutQT)
+        self.menuSetting.addAction(self.actionApiSetting)
         self.toolBar.addAction(self.actionStation)
         self.toolBar.addSeparator()
         self.toolBar.addAction(self.actionCamera)
@@ -140,10 +143,11 @@ class Ui_MainWindow(object):
         self.actionExit.setText(QCoreApplication.translate("MainWindow", u"Exit", None))
         self.actionStation.setText(QCoreApplication.translate("MainWindow", u"Station", None))
         self.actionCamera.setText(QCoreApplication.translate("MainWindow", u"Camera", None))
+        self.actionApiSetting.setText(QCoreApplication.translate("MainWindow", u"API", None))
         self.textBarcodeInsert.setPlaceholderText(QCoreApplication.translate("MainWindow", u"BARCODE TEXT INSERT HERE", None))
         self.statusLabel.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
-        self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
-        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
+        self.pushButton_test1.setText(QCoreApplication.translate("MainWindow", u"TEST1", None))
+        self.pushButton_test2.setText(QCoreApplication.translate("MainWindow", u"TEST2", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
         self.menuHelp.setTitle(QCoreApplication.translate("MainWindow", u"Help", None))
         self.menuSetting.setTitle(QCoreApplication.translate("MainWindow", u"Setting", None))
