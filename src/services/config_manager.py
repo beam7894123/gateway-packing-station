@@ -10,5 +10,15 @@ class ConfigManager:
     def get_api_url(self):
         return self.settings.value("api_url", "http://localhost:3000")  # Default
     
-    # TODO Add first time setup method here
+    def set_station_id(self, station_id):
+        self.settings.setValue("station_id", station_id)
+        
+    def get_station_id(self):
+        return self.settings.value("station_id", "0")
+    
+    def get_first_time_setup(self):
+        return self.settings.value("first_time", True)
+    
+    def set_first_time_setup(self, first_time):
+        self.settings.setValue("first_time", first_time)
     

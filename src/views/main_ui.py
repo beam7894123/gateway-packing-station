@@ -1,8 +1,10 @@
 from PySide6.QtWidgets import QMainWindow, QMessageBox, QLabel, QDialog
 from PySide6.QtCore import QEvent, QTimer, QThreadPool
 from components.order_list import OrderItem, setup_order_list
+from services.config_manager import ConfigManager
 from services.heartbeat import StatusCheckRunnable, StatusCheckWorker
 from views.settings_api_window import SettingsApiWindow
+from views.settings_station_window import SettingsStationWindow
 from views.ui.mainUi import Ui_MainWindow
 from views.about import AboutPopup
 from views.camera import CameraSettingPopup
@@ -12,7 +14,9 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.setWindowTitle("Station TEST")
+        self.config_manager = ConfigManager()
+        self.checkFirstTimeSetup()
+        self.setMainWindowTitle()
         self.textBarcodeInsert.setFocus()
 
         self.actionExit.triggered.connect(self.close)
@@ -20,6 +24,7 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
         self.actionAboutQT.triggered.connect(self.showAboutQt)
         self.actionCamera.triggered.connect(self.showCamera)
         self.actionApiSetting.triggered.connect(self.showApiSettings)
+        self.actionStation.triggered.connect(self.showStationSettings)
 
         self.textBarcodeInsert.textChanged.connect(self.onTextBarcodeInsertChanged)
         self.textBarcodeInsert.returnPressed.connect(self.onTextBarcodeInsertEnterPressed)
@@ -135,7 +140,27 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
         settings_api = SettingsApiWindow()
         settings_api.finished.connect(self.onApiSettingsSaved)
         settings_api.exec()
+        
+    def showStationSettings(self):
+        setting_station = SettingsStationWindow()
+        setting_station.finished.connect(self.onStationSettingsSaved)
+        setting_station.exec()
+        
+    def onStationSettingsSaved(self, result):
+        if result == QDialog.Accepted:
+            self.setMainWindowTitle()
+    
+    def setMainWindowTitle(self):
+        self.setWindowTitle(f"Station ID {self.config_manager.get_station_id()} - Packing Station Gateway")
 
+    def checkFirstTimeSetup(self):
+        firstTime = self.config_manager.get_first_time_setup()
+        if firstTime == True:
+            QMessageBox.information(self, "Setup Wizard", "Look like it's your first time setting up in this computer! \nPlease configure the API and Station settings.")
+            self.showApiSettings()
+            self.showStationSettings()
+            self.config_manager.set_first_time_setup(False)
+    
     def closeEvent(self, event):
         reply = QMessageBox.question(self, 'Quit', 'Are you sure you want to quit?', 
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
