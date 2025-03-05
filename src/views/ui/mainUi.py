@@ -113,12 +113,12 @@ class Ui_MainWindow(object):
         self.menuSetting = QMenu(self.menubar)
         self.menuSetting.setObjectName(u"menuSetting")
         MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QStatusBar(MainWindow)
-        self.statusbar.setObjectName(u"statusbar")
-        MainWindow.setStatusBar(self.statusbar)
         self.toolBar = QToolBar(MainWindow)
         self.toolBar.setObjectName(u"toolBar")
         MainWindow.addToolBar(Qt.ToolBarArea.TopToolBarArea, self.toolBar)
+        self.statusBar = QStatusBar(MainWindow)
+        self.statusBar.setObjectName(u"statusBar")
+        MainWindow.setStatusBar(self.statusBar)
 
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuSetting.menuAction())
@@ -127,9 +127,9 @@ class Ui_MainWindow(object):
         self.menuHelp.addAction(self.actionAbout)
         self.menuHelp.addAction(self.actionAboutQT)
         self.menuSetting.addAction(self.actionApiSetting)
-        self.toolBar.addAction(self.actionStation)
+        self.menuSetting.addAction(self.actionCamera)
+        self.menuSetting.addAction(self.actionStation)
         self.toolBar.addSeparator()
-        self.toolBar.addAction(self.actionCamera)
 
         self.retranslateUi(MainWindow)
 

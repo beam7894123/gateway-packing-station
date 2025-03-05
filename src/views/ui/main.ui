@@ -113,12 +113,13 @@
      <string>Setting</string>
     </property>
     <addaction name="actionApiSetting"/>
+    <addaction name="actionCamera"/>
+    <addaction name="actionStation"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSetting"/>
    <addaction name="menuHelp"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
     <string>toolBar</string>
@@ -129,10 +130,9 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionStation"/>
    <addaction name="separator"/>
-   <addaction name="actionCamera"/>
   </widget>
+  <widget class="QStatusBar" name="statusBar"/>
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
