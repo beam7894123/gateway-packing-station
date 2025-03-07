@@ -1,6 +1,7 @@
-from PySide6.QtWidgets import QMainWindow, QMessageBox, QLabel, QDialog
+from PySide6.QtWidgets import QMainWindow, QMessageBox, QLabel, QDialog, QApplication
 from PySide6.QtCore import QEvent, QTimer, QThreadPool
 from components.order_list import OrderItem, setup_order_list
+from services.barcode_handler import handle_barcode
 from services.config_manager import ConfigManager
 from services.heartbeat import StatusCheckRunnable, StatusCheckWorker
 from views.settings_api_window import SettingsApiWindow
@@ -104,29 +105,7 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
         barcode_text = self.textBarcodeInsert.text()
         print(f"Barcode: {barcode_text}") # Debug <---------------- NEED REMOVE
         
-        # Start load order data and Start Record <--- NEED ADD
-        if barcode_text.startswith("start|"):
-            _, order_id = barcode_text.split('|', 1)
-            if order_id.isdigit():
-                try:
-                    order_data = APIService.get_data(f'/orders/{order_id}')
-                    if order_data:
-                        order_items = [
-                        OrderItem(item['item']['image'],
-                                item['item']['name'],
-                                item['item']['price'],
-                                item['quantity'])  
-                        for item in order_data['orderItems']
-                        ]
-                    else:
-                        print("No data found for this order ID")
-                except Exception as e:
-                    order_items = []
-                    print(f"Error fetching order data: {e}")
-            else:
-                print("Invalid order ID xwx")
-                
-            setup_order_list(order_items, self.listItemNotScaned)
+        handle_barcode(barcode_text, self.config_manager, self.listItemScaned, self.listItemNotScaned, self.statusBar)
             
         self.textBarcodeInsert.clear()
         self.textBarcodeInsert.setFocus()
@@ -180,18 +159,35 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
         return super().eventFilter(obj, event)
     
     def onPushButtonTest1Clicked(self):
-        respon = APIService.get_data('/orders/2')
-        # print(respon) 
-        order_items = [
-            OrderItem(item['item']['image'],
-                      item['item']['name'],
-                      item['item']['price'],
-                      item['quantity'])  
-            for item in respon['orderItems']
-        ]
-        setup_order_list(order_items, self.listItemNotScaned)
+        try:
+            respon = APIService.get_data('/packing-station/check/items/3')
+            # print(respon)  # Debug <---------------- NEED REMOVE
+            
+            scanned_items = [
+                OrderItem(item['image'],
+                        item['name'],
+                        item['price'],
+                        item['scannedQuantity'])  
+                for item in respon['scanned']
+            ]
+            
+            unscanned_items = [
+                OrderItem(item['image'],
+                        item['name'],
+                        item['price'],
+                        item['unscannedQuantity'])  
+                for item in respon['unscanned']
+            ]
+            
+            setup_order_list(scanned_items, self.listItemScaned)
+            setup_order_list(unscanned_items, self.listItemNotScaned)
+            QApplication.beep()
+            
+        except Exception as e:
+            print(f"Error fetching order data: {e}")
         
     def onPushButtonTest2Clicked(self):
         order_items = []
+        setup_order_list(order_items, self.listItemScaned)
         setup_order_list(order_items, self.listItemNotScaned)
         

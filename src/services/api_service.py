@@ -18,4 +18,4 @@ class APIService:
     def post_data(endpoint, data):
         API_URL = APIService.get_api_url()
         response = requests.post(f"{API_URL}{endpoint}", json=data)
-        return response.json() if response.status_code == 201 else None
+        return response.json()
