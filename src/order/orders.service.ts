@@ -131,19 +131,21 @@ export class OrdersService {
         const order = await this.getOrderById(id, req);
         const pdfBuffer = await pdfPickingList(order);
         const pdfDir = path.join(__dirname, '../../assets/uploads/pdfs');
+        const timestamp = new Date().toISOString().replace(/[-:.]/g, '_');
+        const baseUrl = getBaseUrl(req);
 
         if (!fs.existsSync(pdfDir)) {
             fs.mkdirSync(pdfDir, { recursive: true });
         }
-        const pdfFilePath = path.join(pdfDir, `order-${order.id}.pdf`);
+        const pdfFilePath = path.join(pdfDir, `order-${order.id}-${timestamp}.pdf`);
         try {
             fs.writeFileSync(pdfFilePath, pdfBuffer);
         } catch (error) {
-            console.error('Error Writing PDF File:', error);
-            return res.status(500).json({ error: 'Failed to generate PDF' });
+            console.error('Error Writing PickingList PDF File:', error);
+            return res.status(500).json({ error: 'Failed to generate PickingList PDF >m<' });
         }
 
-        const fileUrl = `/assets/uploads/pdfs/order-${order.id}.pdf`;
+        const fileUrl = `${baseUrl}/assets/uploads/pdfs/order-${order.id}-${timestamp}.pdf`;
         return res.json({ url: fileUrl });
     }
 
