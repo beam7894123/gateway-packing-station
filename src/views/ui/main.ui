@@ -14,11 +14,14 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="3,2">
+   <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="3,0">
     <item>
      <layout class="QVBoxLayout" name="listItem" stretch="0,0,0">
       <item>
        <widget class="QLineEdit" name="textBarcodeInsert">
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
         <property name="placeholderText">
          <string>BARCODE TEXT INSERT HERE</string>
         </property>
@@ -33,35 +36,25 @@
      </layout>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,2,3,0,0">
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
+       <layout class="QVBoxLayout" name="statusLayout">
         <item>
-         <widget class="QWidget" name="widget" native="true">
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>100</height>
-           </size>
+         <widget class="QLabel" name="statusLabel">
+          <property name="styleSheet">
+           <string notr="true">font-size: 24px; font-weight: bold; color: white;</string>
           </property>
-          <widget class="QLabel" name="statusLabel">
-           <property name="geometry">
-            <rect>
-             <x>50</x>
-             <y>40</y>
-             <width>47</width>
-             <height>13</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-          </widget>
+          <property name="text">
+           <string>STATUS: ERROR</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
          </widget>
         </item>
        </layout>
       </item>
-      <item>
+      <item alignment="Qt::AlignHCenter">
        <widget class="QLabel" name="videoCaptureView">
         <property name="text">
          <string>videoCaptureView</string>
@@ -178,6 +171,8 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../assets/resource.qrc"/>
+ </resources>
  <connections/>
 </ui>

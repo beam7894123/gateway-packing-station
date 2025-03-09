@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QLineEdit,
     QListView, QMainWindow, QMenu, QMenuBar,
     QPushButton, QSizePolicy, QStatusBar, QTextBrowser,
     QToolBar, QVBoxLayout, QWidget)
+import resource_rc
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -46,6 +47,7 @@ class Ui_MainWindow(object):
         self.listItem.setObjectName(u"listItem")
         self.textBarcodeInsert = QLineEdit(self.centralwidget)
         self.textBarcodeInsert.setObjectName(u"textBarcodeInsert")
+        self.textBarcodeInsert.setFocusPolicy(Qt.StrongFocus)
 
         self.listItem.addWidget(self.textBarcodeInsert)
 
@@ -64,24 +66,22 @@ class Ui_MainWindow(object):
 
         self.verticalLayout = QVBoxLayout()
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.verticalLayout_2 = QVBoxLayout()
-        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
-        self.widget = QWidget(self.centralwidget)
-        self.widget.setObjectName(u"widget")
-        self.widget.setMinimumSize(QSize(100, 100))
-        self.statusLabel = QLabel(self.widget)
+        self.statusLayout = QVBoxLayout()
+        self.statusLayout.setObjectName(u"statusLayout")
+        self.statusLabel = QLabel(self.centralwidget)
         self.statusLabel.setObjectName(u"statusLabel")
-        self.statusLabel.setGeometry(QRect(50, 40, 47, 13))
+        self.statusLabel.setStyleSheet(u"font-size: 24px; font-weight: bold; color: white;")
+        self.statusLabel.setAlignment(Qt.AlignCenter)
 
-        self.verticalLayout_2.addWidget(self.widget)
+        self.statusLayout.addWidget(self.statusLabel)
 
 
-        self.verticalLayout.addLayout(self.verticalLayout_2)
+        self.verticalLayout.addLayout(self.statusLayout)
 
         self.videoCaptureView = QLabel(self.centralwidget)
         self.videoCaptureView.setObjectName(u"videoCaptureView")
 
-        self.verticalLayout.addWidget(self.videoCaptureView)
+        self.verticalLayout.addWidget(self.videoCaptureView, 0, Qt.AlignHCenter)
 
         self.textBrowser = QTextBrowser(self.centralwidget)
         self.textBrowser.setObjectName(u"textBrowser")
@@ -108,11 +108,13 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout)
 
+        self.verticalLayout.setStretch(0, 1)
+        self.verticalLayout.setStretch(1, 2)
+        self.verticalLayout.setStretch(2, 3)
 
         self.horizontalLayout_2.addLayout(self.verticalLayout)
 
         self.horizontalLayout_2.setStretch(0, 3)
-        self.horizontalLayout_2.setStretch(1, 2)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
@@ -156,7 +158,7 @@ class Ui_MainWindow(object):
         self.actionCamera.setText(QCoreApplication.translate("MainWindow", u"Camera", None))
         self.actionApiSetting.setText(QCoreApplication.translate("MainWindow", u"API", None))
         self.textBarcodeInsert.setPlaceholderText(QCoreApplication.translate("MainWindow", u"BARCODE TEXT INSERT HERE", None))
-        self.statusLabel.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
+        self.statusLabel.setText(QCoreApplication.translate("MainWindow", u"STATUS: ERROR", None))
         self.videoCaptureView.setText(QCoreApplication.translate("MainWindow", u"videoCaptureView", None))
         self.rightDownButton.setText(QCoreApplication.translate("MainWindow", u"rightDownButton", None))
         self.pushButton_test1.setText(QCoreApplication.translate("MainWindow", u"TEST1", None))

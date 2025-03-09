@@ -1,7 +1,8 @@
+import cv2
+# import asset.resource
 from PySide6.QtWidgets import QMainWindow, QMessageBox, QLabel, QDialog, QApplication
 from PySide6.QtCore import QEvent, QTimer, QThreadPool
 from PySide6.QtGui import QImage, QPixmap
-import cv2
 from components.order_list import OrderItem, setup_order_list
 from services.barcode_handler import handle_barcode
 from services.config_manager import ConfigManager
@@ -45,11 +46,9 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
         self.startStatusCheck()
         
         # Video Capture
-        # self.video_service = VideoCaptureService("recorded_video.mp4")
-        # self.cap = cv2.VideoCapture(0)
-        # self.timer = QTimer(self)
-        # self.timer.timeout.connect(self.update_frame)
-        # self.timer.start(30)
+        self.video_service = VideoCaptureService()
+        self.still_image = self.video_service.get_still_image()
+        self.start_preview()
         
         # Test buttons
         self.pushButton_test1.clicked.connect(self.onPushButtonTest1Clicked)
@@ -123,22 +122,35 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
     
     # Recorder ========================================================================
     def update_frame(self):
-        frame = self.video_service.write_frame()
-        if frame is not None:
-            print("Frame captured")  # Debug print
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # Convert BGR to RGB
-            h, w, ch = frame.shape
-            bytes_per_line = ch * w
-            q_img = QImage(frame.data, w, h, bytes_per_line, QImage.Format_RGB888)
-            self.videoCaptureView.setPixmap(QPixmap.fromImage(q_img))
+        if self.video_service.is_video_available:
+            frame = self.video_service.write_frame(order_id=self.config_manager.get_order_id())
+            if frame is not None:
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                h, w, ch = frame.shape
+                qimg = QImage(frame.data, w, h, ch * w, QImage.Format_RGB888)
+                pixmap = QPixmap.fromImage(qimg)
+                self.videoCaptureView.setPixmap(pixmap)
         else:
-            print("No frame captured")  # Debug print
+            # Show still image if no video feed is available
+            self.videoCaptureView.setPixmap(self.still_image)
+
+    def stop_preview(self):
+        self.timer.stop()
+        
+    def start_preview(self):
+        self.video_service.inti_video()
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_frame)
+        self.timer.start(30)
     
     # Event Handler (Other) ========================================================================
     
     def showCamera(self):
-        settings_cam = SettingsCameraWindow()
+        self.stop_preview()
+        settings_cam = SettingsCameraWindow(self.video_service)  # Pass existing service
         settings_cam.exec()
+        self.video_service.inti_video()  # Reinitialize with potential new settings
+        self.start_preview()
 
     def showApiSettings(self):
         settings_api = SettingsApiWindow()

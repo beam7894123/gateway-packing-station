@@ -5,17 +5,17 @@ from PySide6.QtWidgets import QDialog, QFileDialog
 from PySide6.QtGui import QImage, QPixmap
 from PySide6.QtCore import QTimer
 from views.ui.cameraUi import Ui_cameraWidget
-from services.video_service import VideoCaptureService
 from services.config_manager import ConfigManager
 
 class SettingsCameraWindow(QDialog, Ui_cameraWidget):
-    def __init__(self):
+    def __init__(self, video_service):
         super().__init__()
         self.setupUi(self)
+        self.video_service = video_service  # Use shared instance
+        self.config_manager = ConfigManager()
 
         self.setWindowTitle("Camera Settings")
         self.config_manager = ConfigManager()
-        self.video_service = VideoCaptureService()
         self.recording = False
         
         # Camera selection
@@ -24,11 +24,10 @@ class SettingsCameraWindow(QDialog, Ui_cameraWidget):
         self.cameraSelect.setCurrentIndex(self.video_service.config_manager.get_camera_index())
         
         # Camera view
+        self.still_image = self.video_service.get_still_image()
         self.video_service.inti_video()
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_frame)
-        self.timer.start(30)
-        self.update_frame()
+        self.run_update_frame()
+        
         
         # Location settings
         self.locationSelect.setText(self.config_manager.get_video_location())
@@ -49,17 +48,27 @@ class SettingsCameraWindow(QDialog, Ui_cameraWidget):
         
         
     # Video settings ========================================
+    
+    def run_update_frame(self):
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_frame)
+        self.timer.start(30)
+        self.update_frame()
+        
+    
     def update_frame(self):
-        frame = self.video_service.write_frame()
-        if frame is not None:
-            frame = self.video_service.add_timestamp(frame)
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            h, w, ch = frame.shape
-            qimg = QImage(frame.data, w, h, ch * w, QImage.Format_RGB888)
-            self.camera_label.setPixmap(QPixmap.fromImage(qimg))
-            
-        if self.recording and frame is not None:
-            self.video_service.out.write(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
+        if self.video_service.is_video_available:
+            frame = self.video_service.write_frame()
+            if frame is not None:
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                h, w, ch = frame.shape
+                qimg = QImage(frame.data, w, h, ch * w, QImage.Format_RGB888)
+                self.camera_label.setPixmap(QPixmap.fromImage(qimg))
+                
+            if self.recording and frame is not None:
+                self.video_service.out.write(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
+        else:
+            self.camera_label.setPixmap(self.still_image)
     
     def change_camera(self, index):
         self.video_service.change_camera(index)
@@ -99,7 +108,7 @@ class SettingsCameraWindow(QDialog, Ui_cameraWidget):
         self.close()
 
     def closeEvent(self, event):
-        self.video_service.cap.release()
-        if self.video_service.out:
-            self.video_service.out.release()
+        # self.video_service.cap.release()
+        # if self.video_service.out:
+        #     self.video_service.out.release()
         event.accept()

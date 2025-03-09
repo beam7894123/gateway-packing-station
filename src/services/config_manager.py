@@ -28,6 +28,12 @@ class ConfigManager:
         
     def set_video_location(self, location):
         self.settings.setValue("video_save_location", location)
+        
+    def get_order_id(self):
+        return self.settings.value("current_order_id", "")
+    
+    def set_order_id(self, order_id):
+        self.settings.setValue("current_order_id", order_id)
     
     def get_first_time_setup(self):
         return self.settings.value("first_time", True)
