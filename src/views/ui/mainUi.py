@@ -25,7 +25,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(778, 480)
+        MainWindow.resize(933, 757)
         self.actionAbout = QAction(MainWindow)
         self.actionAbout.setObjectName(u"actionAbout")
         self.actionAboutQT = QAction(MainWindow)
@@ -78,10 +78,20 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addLayout(self.verticalLayout_2)
 
+        self.videoCaptureView = QLabel(self.centralwidget)
+        self.videoCaptureView.setObjectName(u"videoCaptureView")
+
+        self.verticalLayout.addWidget(self.videoCaptureView)
+
         self.textBrowser = QTextBrowser(self.centralwidget)
         self.textBrowser.setObjectName(u"textBrowser")
 
         self.verticalLayout.addWidget(self.textBrowser)
+
+        self.rightDownButton = QPushButton(self.centralwidget)
+        self.rightDownButton.setObjectName(u"rightDownButton")
+
+        self.verticalLayout.addWidget(self.rightDownButton)
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
@@ -101,11 +111,12 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_2.addLayout(self.verticalLayout)
 
-        self.horizontalLayout_2.setStretch(0, 1)
+        self.horizontalLayout_2.setStretch(0, 3)
+        self.horizontalLayout_2.setStretch(1, 2)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 778, 21))
+        self.menubar.setGeometry(QRect(0, 0, 933, 21))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuHelp = QMenu(self.menubar)
@@ -146,6 +157,8 @@ class Ui_MainWindow(object):
         self.actionApiSetting.setText(QCoreApplication.translate("MainWindow", u"API", None))
         self.textBarcodeInsert.setPlaceholderText(QCoreApplication.translate("MainWindow", u"BARCODE TEXT INSERT HERE", None))
         self.statusLabel.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
+        self.videoCaptureView.setText(QCoreApplication.translate("MainWindow", u"videoCaptureView", None))
+        self.rightDownButton.setText(QCoreApplication.translate("MainWindow", u"rightDownButton", None))
         self.pushButton_test1.setText(QCoreApplication.translate("MainWindow", u"TEST1", None))
         self.pushButton_test2.setText(QCoreApplication.translate("MainWindow", u"TEST2", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))

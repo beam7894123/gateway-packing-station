@@ -1,14 +1,18 @@
 from PySide6.QtWidgets import QMainWindow, QMessageBox, QLabel, QDialog, QApplication
 from PySide6.QtCore import QEvent, QTimer, QThreadPool
+from PySide6.QtGui import QImage, QPixmap
+import cv2
 from components.order_list import OrderItem, setup_order_list
 from services.barcode_handler import handle_barcode
 from services.config_manager import ConfigManager
 from services.heartbeat import StatusCheckRunnable, StatusCheckWorker
+from services.video_service import VideoCaptureService
 from views.settings_api_window import SettingsApiWindow
 from views.settings_station_window import SettingsStationWindow
+from views.settings_camera_window import SettingsCameraWindow
 from views.ui.mainUi import Ui_MainWindow
 from views.about import AboutPopup
-from views.camera import CameraSettingPopup
+from views.settings_camera_window import SettingsCameraWindow
 from services.api_service import APIService
 
 class MainStationWindow(QMainWindow, Ui_MainWindow):
@@ -30,9 +34,6 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
         self.textBarcodeInsert.textChanged.connect(self.onTextBarcodeInsertChanged)
         self.textBarcodeInsert.returnPressed.connect(self.onTextBarcodeInsertEnterPressed)
         
-        self.pushButton_test1.clicked.connect(self.onPushButtonTest1Clicked)
-        self.pushButton_test2.clicked.connect(self.onPushButtonTest2Clicked)
-        
         # status status label
         self.status_label = QLabel("NOT Connected")
         self.status_label.setStyleSheet("background-color: red; color: white; padding: 5px;")
@@ -42,6 +43,17 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
         self.status_worker = StatusCheckWorker()
         self.status_worker.status_signal.connect(self.updateStatusAtStatusBar)
         self.startStatusCheck()
+        
+        # Video Capture
+        # self.video_service = VideoCaptureService("recorded_video.mp4")
+        # self.cap = cv2.VideoCapture(0)
+        # self.timer = QTimer(self)
+        # self.timer.timeout.connect(self.update_frame)
+        # self.timer.start(30)
+        
+        # Test buttons
+        self.pushButton_test1.clicked.connect(self.onPushButtonTest1Clicked)
+        self.pushButton_test2.clicked.connect(self.onPushButtonTest2Clicked)
         
     # StatusCheck ========================================================================
     def startStatusCheck(self):
@@ -96,8 +108,7 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
     def showAboutQt(self):
         QMessageBox.aboutQt(self)
     
-    
-    # Event Handler (Other) ========================================================================
+    # Barcode Handler ========================================================================
     def onTextBarcodeInsertChanged(self):
         self.textBarcodeInsert.setFocus()
 
@@ -109,11 +120,25 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
             
         self.textBarcodeInsert.clear()
         self.textBarcodeInsert.setFocus()
-
+    
+    # Recorder ========================================================================
+    def update_frame(self):
+        frame = self.video_service.write_frame()
+        if frame is not None:
+            print("Frame captured")  # Debug print
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # Convert BGR to RGB
+            h, w, ch = frame.shape
+            bytes_per_line = ch * w
+            q_img = QImage(frame.data, w, h, bytes_per_line, QImage.Format_RGB888)
+            self.videoCaptureView.setPixmap(QPixmap.fromImage(q_img))
+        else:
+            print("No frame captured")  # Debug print
+    
+    # Event Handler (Other) ========================================================================
+    
     def showCamera(self):
-        if self.cameraSetting_window is None or not self.cameraSetting_window.isVisible():
-            self.cameraSetting_window = CameraSettingPopup()
-            self.cameraSetting_window.show()
+        settings_cam = SettingsCameraWindow()
+        settings_cam.exec()
 
     def showApiSettings(self):
         settings_api = SettingsApiWindow()
@@ -144,6 +169,7 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
         reply = QMessageBox.question(self, 'Quit', 'Are you sure you want to quit?', 
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
+            # self.video_service.stop_recording() # Stop recording before closing
             event.accept()
         else:
             event.ignore()
@@ -159,35 +185,39 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
         return super().eventFilter(obj, event)
     
     def onPushButtonTest1Clicked(self):
-        try:
-            respon = APIService.get_data('/packing-station/check/items/3')
-            # print(respon)  # Debug <---------------- NEED REMOVE
+        if self.video_service.start_recording():
+            self.statusBar.showMessage("Recording started...")
+        # try:
+        #     respon = APIService.get_data('/packing-station/check/items/3')
+        #     # print(respon)  # Debug <---------------- NEED REMOVE
             
-            scanned_items = [
-                OrderItem(item['image'],
-                        item['name'],
-                        item['price'],
-                        item['scannedQuantity'])  
-                for item in respon['scanned']
-            ]
+        #     scanned_items = [
+        #         OrderItem(item['image'],
+        #                 item['name'],
+        #                 item['price'],
+        #                 item['scannedQuantity'])  
+        #         for item in respon['scanned']
+        #     ]
             
-            unscanned_items = [
-                OrderItem(item['image'],
-                        item['name'],
-                        item['price'],
-                        item['unscannedQuantity'])  
-                for item in respon['unscanned']
-            ]
+        #     unscanned_items = [
+        #         OrderItem(item['image'],
+        #                 item['name'],
+        #                 item['price'],
+        #                 item['unscannedQuantity'])  
+        #         for item in respon['unscanned']
+        #     ]
             
-            setup_order_list(scanned_items, self.listItemScaned)
-            setup_order_list(unscanned_items, self.listItemNotScaned)
-            QApplication.beep()
+        #     setup_order_list(scanned_items, self.listItemScaned)
+        #     setup_order_list(unscanned_items, self.listItemNotScaned)
+        #     QApplication.beep()
             
-        except Exception as e:
-            print(f"Error fetching order data: {e}")
+        # except Exception as e:
+        #     print(f"Error fetching order data: {e}")
         
     def onPushButtonTest2Clicked(self):
-        order_items = []
-        setup_order_list(order_items, self.listItemScaned)
-        setup_order_list(order_items, self.listItemNotScaned)
+        self.video_service.stop_recording()
+        self.statusBar.showMessage("Recording stopped and saved.")
+        # order_items = []
+        # setup_order_list(order_items, self.listItemScaned)
+        # setup_order_list(order_items, self.listItemNotScaned)
         
