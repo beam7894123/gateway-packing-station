@@ -16,10 +16,10 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QIcon, QImage, QKeySequence, QLinearGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
-from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QLineEdit,
-    QListView, QMainWindow, QMenu, QMenuBar,
-    QPushButton, QSizePolicy, QStatusBar, QTextBrowser,
-    QToolBar, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QLayout,
+    QLineEdit, QListView, QMainWindow, QMenu,
+    QMenuBar, QPushButton, QSizePolicy, QStatusBar,
+    QTextBrowser, QToolBar, QVBoxLayout, QWidget)
 import resource_rc
 
 class Ui_MainWindow(object):
@@ -66,17 +66,24 @@ class Ui_MainWindow(object):
 
         self.verticalLayout = QVBoxLayout()
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.statusLayout = QVBoxLayout()
-        self.statusLayout.setObjectName(u"statusLayout")
+        self.verticalLayout_2 = QVBoxLayout()
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.verticalLayout_2.setSizeConstraint(QLayout.SetMaximumSize)
         self.statusLabel = QLabel(self.centralwidget)
         self.statusLabel.setObjectName(u"statusLabel")
-        self.statusLabel.setStyleSheet(u"font-size: 24px; font-weight: bold; color: white;")
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.statusLabel.sizePolicy().hasHeightForWidth())
+        self.statusLabel.setSizePolicy(sizePolicy)
+        self.statusLabel.setAutoFillBackground(True)
+        self.statusLabel.setStyleSheet(u"font-size: 24px; font-weight: bold; color: white;background-color: rgb(255, 0, 0);")
         self.statusLabel.setAlignment(Qt.AlignCenter)
 
-        self.statusLayout.addWidget(self.statusLabel)
+        self.verticalLayout_2.addWidget(self.statusLabel)
 
 
-        self.verticalLayout.addLayout(self.statusLayout)
+        self.verticalLayout.addLayout(self.verticalLayout_2)
 
         self.videoCaptureView = QLabel(self.centralwidget)
         self.videoCaptureView.setObjectName(u"videoCaptureView")
@@ -109,8 +116,8 @@ class Ui_MainWindow(object):
         self.verticalLayout.addLayout(self.horizontalLayout)
 
         self.verticalLayout.setStretch(0, 1)
-        self.verticalLayout.setStretch(1, 2)
-        self.verticalLayout.setStretch(2, 3)
+        self.verticalLayout.setStretch(1, 3)
+        self.verticalLayout.setStretch(2, 4)
 
         self.horizontalLayout_2.addLayout(self.verticalLayout)
 

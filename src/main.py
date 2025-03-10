@@ -1,11 +1,19 @@
 import sys
+import qasync
 from PySide6.QtWidgets import QApplication
 from views.main_ui import MainStationWindow
-from utils import set_light_mode
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    # set_light_mode(app)  # Apply light mode <--- NEED FIX
-    window = MainStationWindow()
-    window.show()
-    sys.exit(app.exec())
+    loop = qasync.QEventLoop(app)
+    
+    try:
+        with loop:
+            window = MainStationWindow()
+            window.show()
+            loop.run_forever()
+    finally:
+        # Proper cleanup
+        if window.video_service.cap.isOpened():
+            window.video_service.cap.release()
+        app.quit()

@@ -1,4 +1,4 @@
-from PySide6.QtCore import QRunnable, Signal, QObject
+from PySide6.QtCore import Signal, QObject
 from services.api_service import APIService
 
 class StatusCheckWorker(QObject):
@@ -6,23 +6,13 @@ class StatusCheckWorker(QObject):
 
     def __init__(self):
         super().__init__()
+        self.api_service = APIService()
 
     def check_status(self):
-        is_online = False
-        try:
-            response = APIService.get_data('/packing-station/heartbeat')
+        self.api_service.get_data('/packing-station/heartbeat', self._handle_response)
 
-            is_online = response.get('status', 'Error') == 'OK'
-        except Exception as e:
-            is_online = False
-            # print(f"Error: {e}")
-        
-        self.status_signal.emit(is_online)  # Emit the result to the main thread
-
-class StatusCheckRunnable(QRunnable):
-    def __init__(self, worker):
-        super().__init__()
-        self.worker = worker
-
-    def run(self):
-        self.worker.check_status()  # Run the status check in the background
+    def _handle_response(self, response):
+        if response and response.get('status') == 'OK':
+            self.status_signal.emit(True)
+        else:
+            self.status_signal.emit(False)

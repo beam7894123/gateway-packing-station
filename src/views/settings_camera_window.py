@@ -1,6 +1,5 @@
 import os
 import cv2
-from datetime import datetime
 from PySide6.QtWidgets import QDialog, QFileDialog
 from PySide6.QtGui import QImage, QPixmap
 from PySide6.QtCore import QTimer
@@ -25,7 +24,7 @@ class SettingsCameraWindow(QDialog, Ui_cameraWidget):
         
         # Camera view
         self.still_image = self.video_service.get_still_image()
-        self.video_service.inti_video()
+        self.video_service.init_video()
         self.run_update_frame()
         
         
@@ -80,7 +79,7 @@ class SettingsCameraWindow(QDialog, Ui_cameraWidget):
         else:
             self.recording = False
             self.record_button.setText("Start Recording")
-        
+        self.update_frame()
            
         
     # Location settings ========================================

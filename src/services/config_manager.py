@@ -32,6 +32,15 @@ class ConfigManager:
     def get_order_id(self):
         return self.settings.value("current_order_id", "")
     
+    def clear_order_id(self):
+        self.settings.setValue("current_order_id", "")
+    
+    def get_is_order_status_free(self):
+        if self.get_order_id() == "":
+            return True
+        else:
+            return False
+    
     def set_order_id(self, order_id):
         self.settings.setValue("current_order_id", order_id)
     

@@ -1,3 +1,4 @@
+import time
 import cv2
 import os
 import resource_rc # Don't remove this line!
@@ -14,19 +15,25 @@ class VideoCaptureService:
         self.preview_width = preview_width
         self.preview_height = int((self.preview_width * 3) / 4)
         self.preview_resolution = (self.preview_width, self.preview_height)
-        self.cap = cv2.VideoCapture(0)  # Open webcam 0 by default
         
-        if not self.cap.isOpened():
-            print("Error: Could not open webcam")
-            self.is_video_available = False
-        else:
-            self.is_video_available = True
+        # Initialize with safe camera opening
+        self.cap = self._safe_camera_init()
+        self.is_video_available = self.cap.isOpened()
+        
+        # Fallback to default camera if configured camera fails
+        if not self.is_video_available:
+            print("Configured camera failed. Falling back to default camera...")
+            self.cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+            self.is_video_available = self.cap.isOpened()
         
         # Get the webcam's native resolution
-        self.resolution = (
-            int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)),  # Width
-            int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))  # Height
-        )
+        if self.is_video_available:
+            self.resolution = (
+                int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
+                int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            )
+        else:
+            self.resolution = (640, 480)  # Fallback resolution
             
         self.out = None
         self.is_recording = False
@@ -77,33 +84,70 @@ class VideoCaptureService:
             
         print(f"Video saved as {self.filename}")
 
-    def write_frame(self, order_id=None):
-        if self.cap.isOpened():
-            ret, frame = self.cap.read()
-            if ret:
-                frame = cv2.resize(frame, self.resolution) 
-                frame = self.add_timestamp(frame)  # Add timestamp
-                frame = self.add_order_id(frame, order_id)  # Add order ID
-                if self.is_recording and self.out is not None:
-                    self.out.write(frame)
-                frame_resized = cv2.resize(frame, self.preview_resolution)
-                return frame_resized
-            else:
-                print("Error: Could not read frame")
-        else:
-            print("Error: Webcam is not opened")
-        return None
+    def write_frame(self):
+        if not self.cap.isOpened():
+            print("Camera not available, attempting recovery...")
+            self._recover_camera()
+            return self.last_valid_frame  # Return cached frame
+
+        ret, frame = self.cap.read()
+        # print(f"Frame read: {ret}")
+        if not ret:
+            print("Frame read failed, initiating recovery...")
+            self._recover_camera()
+            return self.last_valid_frame  # Return cached frame
+
+        try:
+            # Process frame
+            processed_frame = cv2.resize(frame, self.resolution)
+            processed_frame = self.add_timestamp(processed_frame)
+            processed_frame = self.add_order_id(processed_frame)
+            self.last_valid_frame = cv2.resize(processed_frame, self.preview_resolution)
+            
+            if self.is_recording and self.out is not None:
+                self.out.write(processed_frame)
+                
+            return self.last_valid_frame
+            
+        except Exception as e:
+            print(f"Frame processing error: {str(e)}")
+            return self.last_valid_frame  # Return cached frame
         
-    def inti_video(self):
+    def _safe_camera_init(self, retries=3, delay=1):  # Increased retries and delay
+        """Robust camera initialization with retries"""
+        for i in range(retries):
+            cap = cv2.VideoCapture(self.config_manager.get_camera_index(), cv2.CAP_DSHOW)
+            if cap.isOpened() and cap.read()[0]:  # Verify frame can be read
+                return cap
+            cap.release()  # Ensure proper cleanup
+            print(f"Camera init failed attempt {i+1}/{retries}")
+            time.sleep(delay)
+        return cv2.VideoCapture()
+        
+    def init_video(self):
         if self.cap.isOpened():
             self.cap.release()
-        self.cap = cv2.VideoCapture(self.config_manager.get_camera_index())
+        self.cap = cv2.VideoCapture(self.config_manager.get_camera_index(), cv2.CAP_DSHOW)
         self.is_video_available = self.cap.isOpened()
+        
+    def _recover_camera(self):
+        """Full camera reinitialization sequence"""
+        try:
+            if self.cap.isOpened():
+                self.cap.release()
+            self.cap = self._safe_camera_init()
+            self.is_video_available = self.cap.isOpened()
+            
+            # Reset video writer if recording
+            if self.is_recording and self.out is None:
+                self.start_recording()
+        except Exception as e:
+            print(f"Camera recovery error: {str(e)}")
 
     def change_camera(self, index):
         if self.cap.isOpened():
             self.cap.release()
-        self.cap = cv2.VideoCapture(index)
+        self.cap = cv2.VideoCapture(index, cv2.CAP_DSHOW)
         self.is_video_available = self.cap.isOpened()
 
     def set_save_location(self, folder):
@@ -126,7 +170,8 @@ class VideoCaptureService:
         cv2.putText(frame, timestamp, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
         return frame
     
-    def add_order_id(self, frame, order_id=None):
+    def add_order_id(self, frame):
+        order_id= self.config_manager.get_order_id()
         order_text = f"Order {order_id}" if order_id else "[No Order]"
         text_size = cv2.getTextSize(order_text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
         text_x = frame.shape[1] - text_size[0] - 10  # 10 pixels from the right edge
