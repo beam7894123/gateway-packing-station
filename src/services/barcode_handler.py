@@ -15,7 +15,7 @@ class BarcodeHandler:
                        listItemScaned,
                        listItemNotScaned,
                        statusBar,
-                       status_callback,):
+                       set_status_label,):
         if barcode_text.startswith("start|"):
             _, order_id = barcode_text.split('|', 1)
             if order_id.isdigit():
@@ -48,7 +48,7 @@ class BarcodeHandler:
                         config_manager.set_order_id(order_id)
                         
                         video_service.toggle_recording()
-                        status_callback(1)
+                        set_status_label(1)
                     else:
                         print("No data found for this order ID")
                         statusBar.showMessage("No data found for this order ID")
@@ -66,7 +66,7 @@ class BarcodeHandler:
                 try:
                     video_service.toggle_recording()
                     video_file = video_service.get_last_recorded_video()  # Implement this method in VideoCaptureService
-                    status_callback(2)
+                    set_status_label(2)
                     
                     await asyncio.sleep(1)
                     print("video file", video_file)
@@ -84,7 +84,7 @@ class BarcodeHandler:
                         if order_data['status'] == '0':
                             print("Error sending order data")
                             statusBar.showMessage("Error sending order data")
-                            status_callback(3)
+                            set_status_label(3)
                             setup_order_list([], listItemScaned)
                             setup_order_list([], listItemNotScaned)
                         else:
@@ -93,20 +93,20 @@ class BarcodeHandler:
                             setup_order_list([], listItemScaned)
                             setup_order_list([], listItemNotScaned)
                             self.config_manager.clear_order_id() # why???
-                            status_callback(0)
+                            set_status_label(0)
                 except Exception as e:
                     print(f"Error sending order data: {e}")
                     statusBar.showMessage("Error sending order data")
-                    status_callback(3)
+                    set_status_label(3)
                     
         elif barcode_text.startswith("test1"):
-            status_callback(1)
+            set_status_label(1)
         elif barcode_text.startswith("test2"):
-            status_callback(2)
+            set_status_label(2)
         elif barcode_text.startswith("test3"):
-            status_callback(3)
+            set_status_label(3)
         elif barcode_text.startswith("test0"):
-            status_callback(0)
+            set_status_label(0)
                     
         # Item Scan
         else:
@@ -143,4 +143,4 @@ class BarcodeHandler:
             except Exception as e:
                 print(f"Error: Invalid barcode")
                 statusBar.showMessage("Error: Invalid barcode")
-                
+        

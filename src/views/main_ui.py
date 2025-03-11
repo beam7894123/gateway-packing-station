@@ -19,6 +19,7 @@ from views.settings_camera_window import SettingsCameraWindow
 
 class MainStationWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
+        # TODO: Add force for textBarcodeInsert
         super().__init__()
         self.setupUi(self)
         self.config_manager = ConfigManager()
@@ -53,20 +54,22 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
         self.video_service.init_video()
         self.start_preview()
         
+        #Big buttons
+        self.bigRightDownButtonConfig()
+        
         # Test buttons
         self.pushButton_test1.clicked.connect(self.onPushButtonTest1Clicked)
         self.pushButton_test2.clicked.connect(self.onPushButtonTest2Clicked)
         
     # StatusCheck ========================================================================
-    # TODO: checkStatusInBackground not start up when the app start >m<
     def startStatusCheck(self):
         self.statusBar.showMessage("Checking API...")
         self.status_label.setText("Reconnecting")
         self.status_label.setStyleSheet("background-color: #8B8000; color: white; padding: 5px;")
-        self.checkStatusInBackground()  # Check the status immediately (Just incase)
         self.timer = QTimer(self)
         self.timer.timeout.connect(lambda: asyncio.ensure_future(self.status_worker.check_status()))
         self.timer.start(30000)  # Don't check lower than 10 seconds it will be break XD
+        QTimer.singleShot(2000, self.checkStatusInBackground)  # Check the status immediately (2 sec after Just incase)
 
     def checkStatusInBackground(self):
         asyncio.ensure_future(self.status_worker.check_status())
@@ -138,6 +141,7 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
             self.statusLabel.setStyleSheet("font-size: 24px; font-weight: bold; color: white; background-color: red;")
             self.is_recording_animation_active = True
             self.start_rec_animation()
+            self.toggleRecordingButton()
         elif status_code == 2:  # Processing
             self.statusLabel.setStyleSheet("font-size: 24px; font-weight: bold; color: white; background-color: #8B8000;")
             self.statusLabel.setText("STATUS: PROCESSING")
@@ -190,6 +194,23 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
         self.video_service.init_video()  # Reinitialize with potential new settings
         self.start_preview()
     
+    # Start up ========================================================================
+    def checkFirstTimeSetup(self):
+        firstTime = self.config_manager.get_first_time_setup()
+        if firstTime == True:
+            QMessageBox.information(self, "Setup Wizard", "Look like it's your first time setting up in this computer! \nPlease configure the API and Station settings.")
+            self.showApiSettings()
+            self.showStationSettings()
+            self.config_manager.set_first_time_setup(False)
+            
+    def orderLeftCheck(self):
+        if self.config_manager.get_is_order_status_free() == False:
+            warn = QMessageBox.warning(self, 'Warning', f'It look like you still have unfulfill Order {self.config_manager.get_order_id()}.\nDo you want to reset this order? ', QMessageBox.Reset | QMessageBox.Reset, QMessageBox.No)
+            if warn == QMessageBox.Reset:
+                self.config_manager.clear_order_id()
+            if warn == QMessageBox.No:
+                return
+    
     # Event Handler (Other) ========================================================================
 
     def showApiSettings(self):
@@ -208,23 +229,29 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
     
     def setMainWindowTitle(self):
         self.setWindowTitle(f"Station ID {self.config_manager.get_station_id()} - Packing Station Gateway")
+        
+    def bigRightDownButtonConfig(self):
+        self.rightDownButton.setEnabled(False)
+        self.rightDownButton.setText("")
 
-    # Start up ========================================================================
-    def checkFirstTimeSetup(self):
-        firstTime = self.config_manager.get_first_time_setup()
-        if firstTime == True:
-            QMessageBox.information(self, "Setup Wizard", "Look like it's your first time setting up in this computer! \nPlease configure the API and Station settings.")
-            self.showApiSettings()
-            self.showStationSettings()
-            self.config_manager.set_first_time_setup(False)
-            
-    def orderLeftCheck(self):
-        if self.config_manager.get_is_order_status_free() == False:
-            warn = QMessageBox.warning(self, 'Warning', f'It look like you still have unfulfill Order {self.config_manager.get_order_id()}.\nDo you want to reset this order? ', QMessageBox.Reset | QMessageBox.Reset, QMessageBox.No)
-            if warn == QMessageBox.Reset:
-                self.config_manager.clear_order_id()
-            if warn == QMessageBox.No:
-                return
+    def toggleRecordingButton(self):
+        if self.video_service.is_recording:
+            self.rightDownButton.setText("Stop Recording")
+            self.rightDownButton.clicked.connect(self.clear_order)
+            self.rightDownButton.setEnabled(True)
+    
+    def clear_order(self):
+        reply = QMessageBox.warning(self, 'Warning', 'Are you sure you want to abandon this order?\nYour progress will be lost!', 
+                                     QMessageBox.No | QMessageBox.Yes, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.video_service.stop_recording()
+            self.config_manager.clear_order_id()
+            setup_order_list([], self.listItemScaned)
+            setup_order_list([], self.listItemNotScaned)
+            self.config_manager.clear_order_id()
+            self.set_status_label(0)
+            self.bigRightDownButtonConfig()
+            self.statusBar.showMessage("Order Cleared!")
     
     def closeEvent(self, event): # 3 if else statement lol
         reply = QMessageBox.question(self, 'Quit', 'Are you sure you want to quit?', 
@@ -246,4 +273,4 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
         self.video_service.toggle_recording()
         
     def onPushButtonTest2Clicked(self):
-        self.checkStatusInBackground()
+        self.clear_order()
