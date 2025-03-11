@@ -1,39 +1,33 @@
+import asyncio
 from services.api_service import APIService
 from components.order_list import OrderItem, setup_order_list
 from services.config_manager import ConfigManager
-from services.video_service import VideoCaptureService
-from qasync import asyncSlot
 
 class BarcodeHandler:
     def __init__(self):
-        self.config_manager = ConfigManager()
-        self.video_service = VideoCaptureService()
         self.api_service = APIService()
-        self._active = True
-        
-    def cancel(self):
-        """Cancel pending operations"""
-        self._active = False
-
+        self.config_manager = ConfigManager()
+    
     async def handle_barcode(self,
                        barcode_text,
                        config_manager,
+                       video_service,
                        listItemScaned,
                        listItemNotScaned,
                        statusBar,
                        status_callback,):
-        if not self._active:
-            return
         if barcode_text.startswith("start|"):
             _, order_id = barcode_text.split('|', 1)
             if order_id.isdigit():
                 try:
+                    
                     order_data = await self.api_service.post_data('/packing-station/start',
                                                     {
                                                         'orderId': order_id,
                                                         'station': config_manager.get_station_id(),
                                                         'status': '1'
                                                     })
+                    print(order_data)
                     if order_data:
                         scanned_items = [
                             OrderItem(item['image'],
@@ -51,9 +45,9 @@ class BarcodeHandler:
                         ]
                         setup_order_list(scanned_items, listItemScaned)
                         setup_order_list(unscanned_items, listItemNotScaned)
-                        # Set order ID and start recording
                         config_manager.set_order_id(order_id)
-                        self.video_service.start_recording()
+                        
+                        video_service.toggle_recording()
                         status_callback(1)
                     else:
                         print("No data found for this order ID")
@@ -70,21 +64,55 @@ class BarcodeHandler:
             _, order_id = barcode_text.split('|', 1)
             if order_id.isdigit():
                 try:
-                    order_data = await self.api_service.post_data('/packing-station/end',
-                                                    {
-                                                        'orderId': order_id,
-                                                        'station': config_manager.get_station_id(),
-                                                        'status': '2'
-                                                    })
+                    video_service.toggle_recording()
+                    video_file = video_service.get_last_recorded_video()  # Implement this method in VideoCaptureService
+                    status_callback(2)
+                    
+                    await asyncio.sleep(1)
+                    print("video file", video_file)
+                    order_data = await self.api_service.post_data(
+                        '/packing-station/finish',
+                        {
+                            'orderId': order_id,
+                            'station': self.config_manager.get_station_id(),
+                            'status': '2'
+                        },
+                        file_path=video_file
+                    )
+                    
+                    if order_data:
+                        if order_data['status'] == '0':
+                            print("Error sending order data")
+                            statusBar.showMessage("Error sending order data")
+                            status_callback(3)
+                            setup_order_list([], listItemScaned)
+                            setup_order_list([], listItemNotScaned)
+                        else:
+                            print("Order data sent successfully")
+                            statusBar.showMessage("Order data sent successfully")
+                            setup_order_list([], listItemScaned)
+                            setup_order_list([], listItemNotScaned)
+                            self.config_manager.clear_order_id() # why???
+                            status_callback(0)
                 except Exception as e:
-                    print(f"Error senting order data: {e}")
-                    statusBar.showMessage("Error senting order data")
-        
+                    print(f"Error sending order data: {e}")
+                    statusBar.showMessage("Error sending order data")
+                    status_callback(3)
+                    
+        elif barcode_text.startswith("test1"):
+            status_callback(1)
+        elif barcode_text.startswith("test2"):
+            status_callback(2)
+        elif barcode_text.startswith("test3"):
+            status_callback(3)
+        elif barcode_text.startswith("test0"):
+            status_callback(0)
+                    
         # Item Scan
         else:
             try:
                 barcode_data = await self.api_service.post_data('/packing-station/item/', {
-                    'orderId': "1",
+                    'orderId': config_manager.get_order_id(),
                     'station': config_manager.get_station_id(),
                     'itemCode': barcode_text
                 })
@@ -106,6 +134,11 @@ class BarcodeHandler:
                     ]
                     setup_order_list(scanned_items, listItemScaned)
                     setup_order_list(unscanned_items, listItemNotScaned)
+                    
+                else:
+                    print("No data found for this barcode")
+                    statusBar.showMessage("No data found for this barcode")
+                    
                 
             except Exception as e:
                 print(f"Error: Invalid barcode")

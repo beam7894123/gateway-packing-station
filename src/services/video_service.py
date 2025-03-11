@@ -15,6 +15,8 @@ class VideoCaptureService:
         self.preview_width = preview_width
         self.preview_height = int((self.preview_width * 3) / 4)
         self.preview_resolution = (self.preview_width, self.preview_height)
+        self.last_video_path = None
+        self.order_id = None
         
         # Initialize with safe camera opening
         self.cap = self._safe_camera_init()
@@ -67,10 +69,11 @@ class VideoCaptureService:
         
         # Set the filename with a timestamp
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.filename = os.path.join(self.output_folder, f"recording_OrderX_{timestamp}.mp4")
+        self.order_id = self.config_manager.get_order_id()
+        self.filename = os.path.join(self.output_folder, f"recording_Order{self.order_id}_{timestamp}.mp4")
         
         # Initialize VideoWriter with the correct settings
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        fourcc = cv2.VideoWriter_fourcc(*'H264')
         self.out = cv2.VideoWriter(self.filename, fourcc, fps, (width, height))
         
         self.is_recording = True
@@ -81,37 +84,51 @@ class VideoCaptureService:
         if self.out is not None:
             self.out.release()
             self.out = None
-            
+        
+        self.last_video_path = self.filename    
         print(f"Video saved as {self.filename}")
+    
+    def get_last_recorded_video(self):
+        return self.last_video_path
 
     def write_frame(self):
-        if not self.cap.isOpened():
-            print("Camera not available, attempting recovery...")
-            self._recover_camera()
-            return self.last_valid_frame  # Return cached frame
+        max_attempts = 5  # Maximum recovery attempts
+        attempt = 0
+        
+        while attempt < max_attempts:
+            if not self.cap.isOpened():
+                # print("Camera not available, attempting recovery...")
+                self._recover_camera()
+                attempt += 1
+                continue  # Skip to next iteration
 
-        ret, frame = self.cap.read()
-        # print(f"Frame read: {ret}")
-        if not ret:
-            print("Frame read failed, initiating recovery...")
-            self._recover_camera()
-            return self.last_valid_frame  # Return cached frame
+            ret, frame = self.cap.read()
+            if not ret:
+                print("Frame read failed, initiating recovery...")
+                self._recover_camera()
+                attempt += 1
+                continue  # Skip to next iteration
 
-        try:
-            # Process frame
-            processed_frame = cv2.resize(frame, self.resolution)
-            processed_frame = self.add_timestamp(processed_frame)
-            processed_frame = self.add_order_id(processed_frame)
-            self.last_valid_frame = cv2.resize(processed_frame, self.preview_resolution)
-            
-            if self.is_recording and self.out is not None:
-                self.out.write(processed_frame)
+            try:
+                # Process frame
+                processed_frame = cv2.resize(frame, self.resolution)
+                processed_frame = self.add_timestamp(processed_frame)
+                processed_frame = self.add_order_id(processed_frame)
+                last_valid_frame = cv2.resize(processed_frame, self.preview_resolution)
                 
-            return self.last_valid_frame
-            
-        except Exception as e:
-            print(f"Frame processing error: {str(e)}")
-            return self.last_valid_frame  # Return cached frame
+                if self.is_recording and self.out is not None:
+                    self.out.write(processed_frame)
+                    
+                return last_valid_frame  # Return valid frame
+                
+            except Exception as e:
+                print(f"Frame processing error: {str(e)}")
+                attempt += 1
+                continue  # Skip to next iteration
+
+        # If max attempts reached, return cached frame
+        print(f"Max recovery attempts ({max_attempts}) reached. Using cached frame.")
+        return last_valid_frame
         
     def _safe_camera_init(self, retries=3, delay=1):  # Increased retries and delay
         """Robust camera initialization with retries"""

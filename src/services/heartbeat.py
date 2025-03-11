@@ -8,8 +8,9 @@ class StatusCheckWorker(QObject):
         super().__init__()
         self.api_service = APIService()
 
-    def check_status(self):
-        self.api_service.get_data('/packing-station/heartbeat', self._handle_response)
+    async def check_status(self):
+        response = await self.api_service.get_data('/packing-station/heartbeat')
+        self._handle_response(response)
 
     def _handle_response(self, response):
         if response and response.get('status') == 'OK':

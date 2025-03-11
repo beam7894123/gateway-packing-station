@@ -48,6 +48,7 @@ class Ui_MainWindow(object):
         self.textBarcodeInsert = QLineEdit(self.centralwidget)
         self.textBarcodeInsert.setObjectName(u"textBarcodeInsert")
         self.textBarcodeInsert.setFocusPolicy(Qt.StrongFocus)
+        self.textBarcodeInsert.setStyleSheet(u"font-size: 24px; font-weight: bold;")
 
         self.listItem.addWidget(self.textBarcodeInsert)
 
@@ -76,7 +77,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.statusLabel.sizePolicy().hasHeightForWidth())
         self.statusLabel.setSizePolicy(sizePolicy)
-        self.statusLabel.setAutoFillBackground(True)
+        self.statusLabel.setAutoFillBackground(False)
         self.statusLabel.setStyleSheet(u"font-size: 24px; font-weight: bold; color: white;background-color: rgb(255, 0, 0);")
         self.statusLabel.setAlignment(Qt.AlignCenter)
 
@@ -97,6 +98,7 @@ class Ui_MainWindow(object):
 
         self.rightDownButton = QPushButton(self.centralwidget)
         self.rightDownButton.setObjectName(u"rightDownButton")
+        self.rightDownButton.setStyleSheet(u"font-size: 16px; font-weight: bold;")
 
         self.verticalLayout.addWidget(self.rightDownButton)
 

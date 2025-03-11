@@ -24,7 +24,10 @@ class ConfigManager:
         self.settings.setValue("camera_index", camera_index)
         
     def get_video_location(self):
-        return self.settings.value("video_save_location", os.path.join(os.getcwd(), "camera_records"))
+        location = self.settings.value("video_save_location", "")
+        if not location:
+            location = os.path.join(os.getcwd(), "camera_records")
+        return location
         
     def set_video_location(self, location):
         self.settings.setValue("video_save_location", location)
@@ -49,6 +52,4 @@ class ConfigManager:
     
     def set_first_time_setup(self, first_time):
         self.settings.setValue("first_time", first_time)
-        
-    # TODO: Add order_id and order_status methods for saving order data
     

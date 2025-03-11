@@ -53,6 +53,13 @@ class ItemDelegate(QStyledItemDelegate):
 
 def setup_order_list(order_items, list_view):
     """Attach the OrderList model and delegate to an existing QListView."""
-    model = OrderItemModel(order_items)
-    list_view.setModel(model)
-    list_view.setItemDelegate(ItemDelegate())
+    
+    # If order_items is empty, reset the model
+    if not order_items:
+        list_view.setModel(QStandardItemModel())  # Clears the list
+    
+    # Otherwise, set the model with new order items
+    else:
+        model = OrderItemModel(order_items)
+        list_view.setModel(model)
+        list_view.setItemDelegate(ItemDelegate())
