@@ -12,7 +12,7 @@ class AboutPopup(QDialog):
         layout = QVBoxLayout()
         
         # Create QLabel for text
-        about_text = QLabel('Packing station application.\nVersion A0.1\n\nAuthor: BezaTheCat\n')
+        about_text = QLabel('Packing station application.\nVersion A0.2\n\nAuthor: BezaTheCat\n')
         about_text.setAlignment(Qt.AlignCenter)
 
         cat_text = QLabel('Meoww!')
