@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1027</width>
+    <height>743</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="4,1">
+    <item>
+     <layout class="QVBoxLayout" name="listItem" stretch="0,0,0">
+      <item>
+       <widget class="QLineEdit" name="textBarcodeInsert">
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font-size: 24px; font-weight: bold;</string>
+        </property>
+        <property name="placeholderText">
+         <string>BARCODE TEXT INSERT HERE</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QListView" name="listItemNotScaned"/>
+      </item>
+      <item>
+       <widget class="QListView" name="listItemScaned"/>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,3,4,0">
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetMaximumSize</enum>
+        </property>
+        <item>
+         <widget class="QLabel" name="statusLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="statusTip">
+           <string>Status</string>
+          </property>
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font-size: 24px; font-weight: bold; color: white;background-color: rgb(255, 0, 0);</string>
+          </property>
+          <property name="text">
+           <string>STATUS: ERROR</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QLabel" name="videoCaptureView">
+        <property name="text">
+         <string>videoCaptureView</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTextEdit" name="logWindow"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="rightDownButton">
+        <property name="styleSheet">
+         <string notr="true">font-size: 24px; font-weight: bold;</string>
+        </property>
+        <property name="text">
+         <string>rightDownButton</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1027</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+    <addaction name="actionAboutQT"/>
+   </widget>
+   <widget class="QMenu" name="menuSetting">
+    <property name="title">
+     <string>Setting</string>
+    </property>
+    <addaction name="actionApiSetting"/>
+    <addaction name="actionCamera"/>
+    <addaction name="actionStation"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuSetting"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+   <property name="statusTip">
+    <string>About me :3</string>
+   </property>
+   <property name="whatsThis">
+    <string>About meeee &gt;w&lt;</string>
+   </property>
+  </action>
+  <action name="actionAboutQT">
+   <property name="text">
+    <string>AboutQT</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+   <property name="statusTip">
+    <string>Exit</string>
+   </property>
+   <property name="whatsThis">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionStation">
+   <property name="text">
+    <string>Station</string>
+   </property>
+  </action>
+  <action name="actionCamera">
+   <property name="text">
+    <string>Camera</string>
+   </property>
+  </action>
+  <action name="actionApiSetting">
+   <property name="text">
+    <string>API</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../../assets/resource.qrc"/>
+ </resources>
+ <connections/>
+</ui>
