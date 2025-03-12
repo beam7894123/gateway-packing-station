@@ -36,6 +36,7 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
         
         # Barcode
         self.textBarcodeInsert.returnPressed.connect(lambda: asyncio.ensure_future(self.onTextBarcodeInsertEnterPressed()))
+        self.textBarcodeInsert.installEventFilter(self)
         self.set_status_label(0)
         
         # status status label
@@ -135,6 +136,16 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
         )
             
         self.textBarcodeInsert.clear()
+        
+    def eventFilter(self, obj, event):
+        if obj == self.textBarcodeInsert:
+            if event.type() == QEvent.FocusIn:
+                self.textBarcodeInsert.setStyleSheet("font-size: 24px; font-weight: bold;")
+                self.textBarcodeInsert.setPlaceholderText("INSERT BARCODE TEXT HERE")
+            elif event.type() == QEvent.FocusOut:
+                self.textBarcodeInsert.setStyleSheet("background-color: #8B8000; font-size: 24px; font-weight: bold;")
+                self.textBarcodeInsert.setPlaceholderText("CLICK HERE TO START THE SCAN")
+        return super().eventFilter(obj, event)
         
     # Status Label ========================================================================
     def set_status_label(self, status_code):
