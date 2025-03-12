@@ -17,7 +17,7 @@ model users {
 
 model items {
   id           Int                  @id @default(autoincrement())
-  itemCode     String
+  itemCode     String               @unique
   name         String
   description  String?
   price        Float?
@@ -58,11 +58,10 @@ model order_items {
 model packing_proofs {
   id             Int                  @id @default(autoincrement())
   orderId        Int
-  video          String
+  video          String?
   station        String
-  startTime      DateTime
   finishTime     DateTime?
-  isSuccessfully Int                  @default(0)
+  status Int                  @default(0)
   createdAt      DateTime             @default(now())
   updatedAt      DateTime?
   isDeleted      Int                  @default(0)
@@ -71,14 +70,16 @@ model packing_proofs {
 }
 
 model packing_scans_list {
-  id              Int            @id @default(autoincrement())
-  packingProofId  Int
-  orderId         Int
-  itemId          Int
-  scannedQuantity Int
-  scannedAt       DateTime       @default(now())
-  isDeleted       Int            @default(0)
-  item            items          @relation(fields: [itemId], references: [id], onDelete: Cascade)
-  order           orders         @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  packingProof    packing_proofs @relation(fields: [packingProofId], references: [id], onDelete: Cascade)
+  id             Int            @id @default(autoincrement())
+  packingProofId Int
+  orderId        Int
+  itemId         Int
+  isDeleted      Int            @default(0)
+  scannedAt      DateTime       @default(now())
+  item           items          @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  order          orders         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  packingProof   packing_proofs @relation(fields: [packingProofId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([itemId])
 }

@@ -55,6 +55,27 @@ export class OrdersService {
         };
     }    
 
+    async getRecordVideo(id: number, res: Response, req: Request) {
+      const baseUrl = getBaseUrl(req);
+      
+      const packingProof = await this.prisma.packing_proofs.findFirst({
+          where: {
+              orderId: id,
+              isDeleted: 0,
+          },
+          select: {
+              video: true,
+          },
+      });
+  
+      if (!packingProof || !packingProof.video) {
+          return res.status(404).json({ error: 'No video found for this order >m<' });
+      }
+  
+      return res.json({ url: `${baseUrl}${packingProof.video}` });
+    }
+  
+
     async createOrder(data: OrderDto) {
         const items = data.items;
       

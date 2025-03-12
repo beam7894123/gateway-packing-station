@@ -31,4 +31,9 @@ export class OrdersController {
     async getPickingListPdf(@Param('id') id: number, @Res() res: Response, @Req() req: Request) {
         return this.ordersService.generatePickingListPdf(id, res, req);
     }
+
+  @Get('/:id/record-video')
+    async getRecordVideo(@Param('id') id: number, @Res() res: Response, @Req() req: Request) {
+        return this.ordersService.getRecordVideo(id, res, req);
+    }
 }
