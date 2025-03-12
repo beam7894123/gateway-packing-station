@@ -2,7 +2,7 @@ import asyncio
 import cv2
 # import asset.resource
 from PySide6.QtWidgets import QMainWindow, QMessageBox, QLabel, QDialog
-from PySide6.QtCore import QEvent, QTimer
+from PySide6.QtCore import QEvent, QTimer, QDateTime
 from PySide6.QtGui import QImage, QPixmap
 from components.order_list import OrderItem, setup_order_list
 from components.pop_up import Popup
@@ -54,12 +54,14 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
         self.video_service.init_video()
         self.start_preview()
         
+        #Log window
+        self.logWindow.setReadOnly(True)
+        self.barcode_handler = BarcodeHandler()
+        self.barcode_handler.log_signal.connect(self.add_log_entry)
+        self.barcode_handler.barcode_scanned.connect(self.handle_barcode_scan)
+        
         #Big buttons
         self.bigRightDownButtonConfig()
-        
-        # Test buttons
-        self.pushButton_test1.clicked.connect(self.onPushButtonTest1Clicked)
-        self.pushButton_test2.clicked.connect(self.onPushButtonTest2Clicked)
         
     # StatusCheck ========================================================================
     def startStatusCheck(self):
@@ -82,11 +84,13 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
             self.status_label.setText("Connected!")
             self.status_label.setStyleSheet("background-color: green; color: white; padding: 5px;")
             self.statusBar.showMessage("Connected to API server!", 3000)
+            self.add_log_entry("Connected to server!", "success")
             self.set_status_label(0)
         else:
             self.status_label.setText("NOT Connected")
             self.status_label.setStyleSheet("background-color: red; color: white; padding: 5px;")
             self.statusBar.showMessage("Failed to connect to API server", 5000)
+            self.add_log_entry(f"Failed to connect to server ({self.config_manager.get_api_url()})", "error")
             self.set_status_label(5)
             
         # Update the last known status
@@ -98,9 +102,11 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
             self.status_label.setStyleSheet("background-color: #8B8000; color: white; padding: 5px;")
             if self.last_online_status:
                 self.status_label.setText("Reconnecting")
+                self.add_log_entry("Reconnecting to server...", "warning")
                 self.last_online_status = None
             else:
                 self.status_label.setText("Reconnecting")
+                self.add_log_entry("Reconnecting to server...", "warning")
                 self.last_online_status = None
                 
             self.checkStatusInBackground()
@@ -116,9 +122,8 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
     # Barcode Handler ========================================================================
     async def onTextBarcodeInsertEnterPressed(self):
         barcode_text = self.textBarcodeInsert.text()
-        print(f"Barcode: {barcode_text}")
+        # print(f"Barcode: {barcode_text}")
         
-        self.barcode_handler = BarcodeHandler()
         await self.barcode_handler.handle_barcode(
             barcode_text,
             self.config_manager,
@@ -135,6 +140,7 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
     def set_status_label(self, status_code):
         self.is_recording_animation_active = False
         if status_code == 0:  # Standby
+            self.bigRightDownButtonConfig()
             self.statusLabel.setStyleSheet("font-size: 24px; font-weight: bold; color: white; background-color: green;")
             self.statusLabel.setText("STATUS: STANDBY")
         elif status_code == 1:  # Recording
@@ -143,12 +149,15 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
             self.start_rec_animation()
             self.toggleRecordingButton()
         elif status_code == 2:  # Processing
+            self.bigRightDownButtonConfig()
             self.statusLabel.setStyleSheet("font-size: 24px; font-weight: bold; color: white; background-color: #8B8000;")
             self.statusLabel.setText("STATUS: PROCESSING")
         elif status_code == 3:  # Error
+            self.bigRightDownButtonConfig()
             self.statusLabel.setStyleSheet("font-size: 24px; font-weight: bold; color: white; background-color: #000;")
             self.statusLabel.setText("STATUS: ERROR")
         elif status_code == 5:  # Error
+            self.bigRightDownButtonConfig()
             self.statusLabel.setStyleSheet("font-size: 24px; font-weight: bold; color: white; background-color: #000;")
             self.statusLabel.setText("ERROR: Check API")
             
@@ -173,7 +182,6 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
                 h, w, ch = frame.shape
                 qimg = QImage(frame.data, w, h, ch * w, QImage.Format_RGB888)
                 self.videoCaptureView.setPixmap(QPixmap.fromImage(qimg))
-                cv2.waitKey(1)
         except Exception as e:
             print(f"UI frame update error: {str(e)}")
             self.videoCaptureView.setPixmap(self.video_service.still_image)
@@ -193,6 +201,7 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
         settings_cam.exec()
         self.video_service.init_video()  # Reinitialize with potential new settings
         self.start_preview()
+        self.add_log_entry("Camera reinitialized!", "info")
     
     # Start up ========================================================================
     def checkFirstTimeSetup(self):
@@ -212,6 +221,38 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
                 return
     
     # Event Handler (Other) ========================================================================
+    
+    def add_log_entry(self, message, message_type="info"):
+        timestamp = QDateTime.currentDateTime().toString("[yyyy-MM-dd hh:mm:ss]")
+        color = {
+            "success": "#4CAF50",
+            "error": "#F44336",
+            "warning": "#FFC107",
+            "info": "#2196F3"
+        }.get(message_type, "#FFFFFF")
+
+        html = f"""
+        <div style="margin: 2px 0;">
+            <span style="color: #757575;">{timestamp}</span>
+            <span style="color: {color};">▶</span>
+            <span style="color: {color};">{message}</span>
+        </div>
+        """
+        
+        # Keep only last 1000 lines
+        current_length = self.logWindow.document().blockCount()
+        if current_length > 1000:
+            self.logWindow.clear()
+            
+        self.logWindow.append(html)
+        self.logWindow.verticalScrollBar().setValue(
+            self.logWindow.verticalScrollBar().maximum()
+        )
+        
+    def handle_barcode_scan(self, barcode_data):
+        """Handle barcode scan event"""
+        self.add_log_entry(f"Processing barcode: {barcode_data}", "info")
+        # You can add additional logic here for database checking, etc.
 
     def showApiSettings(self):
         settings_api = SettingsApiWindow()
@@ -245,9 +286,11 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
                                      QMessageBox.No | QMessageBox.Yes, QMessageBox.No)
         if reply == QMessageBox.Yes:
             self.video_service.stop_recording()
+            self.add_log_entry(f"Stopped recording (Order ID: {self.config_manager.get_order_id()})", "info")
             self.config_manager.clear_order_id()
             setup_order_list([], self.listItemScaned)
             setup_order_list([], self.listItemNotScaned)
+            self.add_log_entry(f"Order ID: {self.config_manager.get_order_id()} abandoned!", "warning")
             self.config_manager.clear_order_id()
             self.set_status_label(0)
             self.bigRightDownButtonConfig()
@@ -268,9 +311,3 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
                 event.accept()
         else:
             event.ignore()
-    
-    def onPushButtonTest1Clicked(self):
-        self.video_service.toggle_recording()
-        
-    def onPushButtonTest2Clicked(self):
-        self.clear_order()

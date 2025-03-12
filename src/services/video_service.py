@@ -8,7 +8,7 @@ from PySide6.QtGui import QPixmap
 from PySide6.QtCore import Qt
 
 class VideoCaptureService:
-    def __init__(self, filename="output.mp4", fps=30, preview_width=320):
+    def __init__(self, filename="output.mp4", fps=60, preview_width=320):
         self.config_manager = ConfigManager()
         self.filename = filename
         self.fps = fps

@@ -19,14 +19,14 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
 from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QLayout,
     QLineEdit, QListView, QMainWindow, QMenu,
     QMenuBar, QPushButton, QSizePolicy, QStatusBar,
-    QTextBrowser, QToolBar, QVBoxLayout, QWidget)
+    QTextEdit, QToolBar, QVBoxLayout, QWidget)
 import resource_rc
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(933, 757)
+        MainWindow.resize(1027, 743)
         self.actionAbout = QAction(MainWindow)
         self.actionAbout.setObjectName(u"actionAbout")
         self.actionAboutQT = QAction(MainWindow)
@@ -91,31 +91,16 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.videoCaptureView, 0, Qt.AlignHCenter)
 
-        self.textBrowser = QTextBrowser(self.centralwidget)
-        self.textBrowser.setObjectName(u"textBrowser")
+        self.logWindow = QTextEdit(self.centralwidget)
+        self.logWindow.setObjectName(u"logWindow")
 
-        self.verticalLayout.addWidget(self.textBrowser)
+        self.verticalLayout.addWidget(self.logWindow)
 
         self.rightDownButton = QPushButton(self.centralwidget)
         self.rightDownButton.setObjectName(u"rightDownButton")
-        self.rightDownButton.setStyleSheet(u"font-size: 16px; font-weight: bold;")
+        self.rightDownButton.setStyleSheet(u"font-size: 24px; font-weight: bold;")
 
         self.verticalLayout.addWidget(self.rightDownButton)
-
-        self.horizontalLayout = QHBoxLayout()
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.pushButton_test1 = QPushButton(self.centralwidget)
-        self.pushButton_test1.setObjectName(u"pushButton_test1")
-
-        self.horizontalLayout.addWidget(self.pushButton_test1)
-
-        self.pushButton_test2 = QPushButton(self.centralwidget)
-        self.pushButton_test2.setObjectName(u"pushButton_test2")
-
-        self.horizontalLayout.addWidget(self.pushButton_test2)
-
-
-        self.verticalLayout.addLayout(self.horizontalLayout)
 
         self.verticalLayout.setStretch(0, 1)
         self.verticalLayout.setStretch(1, 3)
@@ -123,11 +108,12 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_2.addLayout(self.verticalLayout)
 
-        self.horizontalLayout_2.setStretch(0, 3)
+        self.horizontalLayout_2.setStretch(0, 4)
+        self.horizontalLayout_2.setStretch(1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 933, 21))
+        self.menubar.setGeometry(QRect(0, 0, 1027, 21))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuHelp = QMenu(self.menubar)
@@ -170,8 +156,6 @@ class Ui_MainWindow(object):
         self.statusLabel.setText(QCoreApplication.translate("MainWindow", u"STATUS: ERROR", None))
         self.videoCaptureView.setText(QCoreApplication.translate("MainWindow", u"videoCaptureView", None))
         self.rightDownButton.setText(QCoreApplication.translate("MainWindow", u"rightDownButton", None))
-        self.pushButton_test1.setText(QCoreApplication.translate("MainWindow", u"TEST1", None))
-        self.pushButton_test2.setText(QCoreApplication.translate("MainWindow", u"TEST2", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
         self.menuHelp.setTitle(QCoreApplication.translate("MainWindow", u"Help", None))
         self.menuSetting.setTitle(QCoreApplication.translate("MainWindow", u"Setting", None))

@@ -15,24 +15,32 @@ class APIService:
     async def get_data(self, endpoint):
         url = QUrl(f"{self.get_api_url()}{endpoint}")
         request = QNetworkRequest(url)
-        future = asyncio.Future()  # Use Future to make async
+        future = asyncio.Future()  # Create Future for async handling
 
         reply = self.network_manager.get(request)
 
         # Handle response
         def handle_reply():
-            if reply.error() == QNetworkReply.NoError:
-                response_data = json.loads(reply.readAll().data().decode('utf-8'))
-                print(f"✅ Response: {response_data}")  # Debugging
-                future.set_result(response_data)  # Resolve Future
-            else:
-                print(f"❌ Error: {reply.errorString()}")
-                future.set_result(None)  # Return None on error
+            response_data = None
+            try:
+                # Always try to read the response, even if there's an error
+                raw_data = reply.readAll().data().decode('utf-8')
+                response_data = json.loads(raw_data) if raw_data else None
+            except json.JSONDecodeError:
+                response_data = {"error": "Invalid JSON response"}
 
+            if reply.error() == QNetworkReply.NoError:
+                print(f"✅ Response: {response_data}")  # Debugging
+            else:
+                print(f"❌ Error ({reply.error()}): {reply.errorString()}")
+                print(f"🔹 Server Response: {response_data}")  # Log the JSON response
+
+            future.set_result(response_data)  # Return JSON data (even on error)
             reply.deleteLater()
 
         reply.finished.connect(handle_reply)
         return await future
+
 
     async def post_data(self, endpoint, data, callback=None, file_path=None):
         url = QUrl(f"{self.get_api_url()}{endpoint}")
@@ -75,13 +83,22 @@ class APIService:
             reply = self.network_manager.post(request, json_data)
 
         def handle_reply():
+            response_data = None
+            try:
+                # Always try to read the response, even if there's an error
+                raw_data = reply.readAll().data().decode('utf-8')
+                response_data = json.loads(raw_data) if raw_data else None
+            except json.JSONDecodeError:
+                response_data = {"error": "Invalid JSON response"}
+
             if reply.error() == QNetworkReply.NoError:
-                response_data = json.loads(reply.readAll().data().decode('utf-8'))
-                print(f"✅ Response: {response_data}")
-                future.set_result(response_data)
+                print(f"✅ Response: {response_data}")  # Debugging
             else:
-                print(f"❌ Error: {reply.errorString()}")
-                future.set_result(None) 
+                print(f"❌ Error ({reply.error()}): {reply.errorString()}")
+                print(f"🔹 Server Response: {response_data}")  # Log the JSON response
+
+            future.set_result(response_data)  # Return JSON data (even on error)
+            reply.deleteLater()
 
             reply.deleteLater()
 

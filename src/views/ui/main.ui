@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>933</width>
-    <height>757</height>
+    <width>1027</width>
+    <height>743</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="3,0">
+   <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="4,1">
     <item>
      <layout class="QVBoxLayout" name="listItem" stretch="0,0,0">
       <item>
@@ -39,7 +39,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,3,4,0,0">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,3,4,0">
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0">
         <property name="sizeConstraint">
@@ -77,35 +77,17 @@
        </widget>
       </item>
       <item>
-       <widget class="QTextBrowser" name="textBrowser"/>
+       <widget class="QTextEdit" name="logWindow"/>
       </item>
       <item>
        <widget class="QPushButton" name="rightDownButton">
         <property name="styleSheet">
-         <string notr="true">font-size: 16px; font-weight: bold;</string>
+         <string notr="true">font-size: 24px; font-weight: bold;</string>
         </property>
         <property name="text">
          <string>rightDownButton</string>
         </property>
        </widget>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QPushButton" name="pushButton_test1">
-          <property name="text">
-           <string>TEST1</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_test2">
-          <property name="text">
-           <string>TEST2</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
       </item>
      </layout>
     </item>
@@ -116,7 +98,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>933</width>
+     <width>1027</width>
      <height>21</height>
     </rect>
    </property>
