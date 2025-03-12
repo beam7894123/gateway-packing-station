@@ -19,7 +19,7 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
 from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QLayout,
     QLineEdit, QListView, QMainWindow, QMenu,
     QMenuBar, QPushButton, QSizePolicy, QStatusBar,
-    QTextEdit, QToolBar, QVBoxLayout, QWidget)
+    QTextEdit, QVBoxLayout, QWidget)
 import resource_rc
 
 class Ui_MainWindow(object):
@@ -121,9 +121,6 @@ class Ui_MainWindow(object):
         self.menuSetting = QMenu(self.menubar)
         self.menuSetting.setObjectName(u"menuSetting")
         MainWindow.setMenuBar(self.menubar)
-        self.toolBar = QToolBar(MainWindow)
-        self.toolBar.setObjectName(u"toolBar")
-        MainWindow.addToolBar(Qt.ToolBarArea.TopToolBarArea, self.toolBar)
         self.statusBar = QStatusBar(MainWindow)
         self.statusBar.setObjectName(u"statusBar")
         MainWindow.setStatusBar(self.statusBar)
@@ -137,7 +134,6 @@ class Ui_MainWindow(object):
         self.menuSetting.addAction(self.actionApiSetting)
         self.menuSetting.addAction(self.actionCamera)
         self.menuSetting.addAction(self.actionStation)
-        self.toolBar.addSeparator()
 
         self.retranslateUi(MainWindow)
 
@@ -147,18 +143,32 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.actionAbout.setText(QCoreApplication.translate("MainWindow", u"About", None))
+#if QT_CONFIG(statustip)
+        self.actionAbout.setStatusTip(QCoreApplication.translate("MainWindow", u"About me :3", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(whatsthis)
+        self.actionAbout.setWhatsThis(QCoreApplication.translate("MainWindow", u"About meeee >w<", None))
+#endif // QT_CONFIG(whatsthis)
         self.actionAboutQT.setText(QCoreApplication.translate("MainWindow", u"AboutQT", None))
         self.actionExit.setText(QCoreApplication.translate("MainWindow", u"Exit", None))
+#if QT_CONFIG(statustip)
+        self.actionExit.setStatusTip(QCoreApplication.translate("MainWindow", u"Exit", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(whatsthis)
+        self.actionExit.setWhatsThis(QCoreApplication.translate("MainWindow", u"Exit", None))
+#endif // QT_CONFIG(whatsthis)
         self.actionStation.setText(QCoreApplication.translate("MainWindow", u"Station", None))
         self.actionCamera.setText(QCoreApplication.translate("MainWindow", u"Camera", None))
         self.actionApiSetting.setText(QCoreApplication.translate("MainWindow", u"API", None))
         self.textBarcodeInsert.setPlaceholderText(QCoreApplication.translate("MainWindow", u"BARCODE TEXT INSERT HERE", None))
+#if QT_CONFIG(statustip)
+        self.statusLabel.setStatusTip(QCoreApplication.translate("MainWindow", u"Status", None))
+#endif // QT_CONFIG(statustip)
         self.statusLabel.setText(QCoreApplication.translate("MainWindow", u"STATUS: ERROR", None))
         self.videoCaptureView.setText(QCoreApplication.translate("MainWindow", u"videoCaptureView", None))
         self.rightDownButton.setText(QCoreApplication.translate("MainWindow", u"rightDownButton", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
         self.menuHelp.setTitle(QCoreApplication.translate("MainWindow", u"Help", None))
         self.menuSetting.setTitle(QCoreApplication.translate("MainWindow", u"Setting", None))
-        self.toolBar.setWindowTitle(QCoreApplication.translate("MainWindow", u"toolBar", None))
     # retranslateUi
 

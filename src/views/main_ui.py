@@ -1,6 +1,6 @@
 import asyncio
 import cv2
-# import asset.resource
+import assets.resource_rc
 from PySide6.QtWidgets import QMainWindow, QMessageBox, QLabel, QDialog
 from PySide6.QtCore import QEvent, QTimer, QDateTime
 from PySide6.QtGui import QImage, QPixmap
