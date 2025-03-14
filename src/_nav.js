@@ -1,18 +1,12 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
 import {
-  cilBell,
-  cilCalculator,
-  cilChartPie,
-  cilCursor,
   cilDescription,
-  cilDrop,
-  cilExternalLink,
-  cilNotes,
-  cilPencil,
-  cilPuzzle,
   cilStar,
-  cilApplications
+  cilApplications,
+  cilCamera,
+  cilCart,
+  cilDiamond
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -22,6 +16,24 @@ const _nav = [
     name: 'Dashboard',
     to: '/dashboard',
     icon: <CIcon icon={cilApplications} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Items',
+    to: '/items',
+    icon: <CIcon icon={cilDiamond} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Orders',
+    to: '/orders',
+    icon: <CIcon icon={cilCart} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Packings Rec',
+    to: '/packings-rec',
+    icon: <CIcon icon={cilCamera} customClassName="nav-icon" />,
   },
   
   // NEED TO REMOVE <--------------------------------------------------------------
