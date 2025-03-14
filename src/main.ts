@@ -17,6 +17,13 @@ async function bootstrap() {
     prefix: '/assets', // Serve static files from /uploads
   });
 
+  app.enableCors({
+    origin: process.env.FRONTEND_URL ?? 'http://localhost:8080',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type,Authorization',
+    credentials: false, // If using cookies or authentication change to true!
+  });
+
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
