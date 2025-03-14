@@ -1,4 +1,5 @@
 import React from 'react'
+import classNames from 'classnames'
 
 import {
   CAvatar,
@@ -42,7 +43,7 @@ import {
   cilUserFemale,
 } from '@coreui/icons'
 
-const Dashboard = () => {
+const Order = () => {
 
   return (
     <>
@@ -52,4 +53,4 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard
+export default Order

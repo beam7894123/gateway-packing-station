@@ -1,17 +1,10 @@
 {
   "name": "@coreui/coreui-free-react-admin-template",
-  "version": "5.4.0",
-  "description": "CoreUI Free React Admin Template",
+  "version": "0.0.1",
+  "description": "",
   "homepage": ".",
-  "bugs": {
-    "url": "https://github.com/coreui/coreui-free-react-admin-template/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:coreui/coreui-free-react-admin-template.git"
-  },
   "license": "MIT",
-  "author": "The CoreUI Team (https://github.com/orgs/coreui/people)",
+  "author": "BezaTheCat & The CoreUI Team",
   "scripts": {
     "build": "vite build",
     "lint": "eslint",
