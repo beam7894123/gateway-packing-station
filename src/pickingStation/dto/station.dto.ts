@@ -12,7 +12,6 @@ export class StationDto {
     station: string;
 
     @IsInt()
-    @IsPositive()
     @IsOptional()
     @Transform(({ value }) => parseInt(value))
     status?: number;

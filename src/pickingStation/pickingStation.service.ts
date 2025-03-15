@@ -37,6 +37,10 @@ export class PickingStationService {
         if (!orderExists) {
             throw new HttpException(`Order with id ${data.orderId} not found or deleted >m<`, HttpStatus.NOT_FOUND);
         }
+
+        if (orderExists.status != 2 && orderExists.status != 3) {
+            throw new HttpException('Order is not ready for packing!', HttpStatus.FORBIDDEN);
+        }
         
         const existingProofs = await this.prisma.packing_proofs.findMany({
             where: { orderId: data.orderId, isDeleted: 0 },
@@ -45,6 +49,11 @@ export class PickingStationService {
         if (existingProofs.length > 0) {
             throw new HttpException('Look like this order is already scanned! :<', HttpStatus.FORBIDDEN);
         }
+
+        await this.prisma.orders.update({
+            where: { id: data.orderId },
+            data: { status: 3 }, // 3 means packing
+        });
 
         const newProof = await this.prisma.packing_proofs.create({
             data: {
@@ -204,7 +213,7 @@ export class PickingStationService {
 
 
         if (data.video) {
-            return await this.prisma.packing_proofs.update({
+            await this.prisma.packing_proofs.update({
                 where: { id: packingProof.id },
                 data: { 
                     status: 2, // 2 means scan finished with video
@@ -214,16 +223,35 @@ export class PickingStationService {
     
                  },
             });
+
+            await this.prisma.orders.update({
+                where: { id: data.orderId },
+                data: { status: 4 }, // 4 means packed
+            });
+
+            return {
+                message: 'Scan finished successfully! uwu',
+                statusCode: 200,}
         }
 
         if (!data.video) {
             // throw new HttpException('Please upload a video! xwx', HttpStatus.BAD_REQUEST);
-            return await this.prisma.packing_proofs.update({
+            await this.prisma.packing_proofs.update({
                 where: { id: packingProof.id },
                 data: { 
                     status: 0, // 0 means Error
                  },
             });
+
+            await this.prisma.orders.update({
+                where: { id: data.orderId },
+                data: { status: 2 }, // 2 roll back to ready for packing
+            });
+
+            return {
+                message: 'Scan finished with error! xwx',
+                statusCode: 200,
+            }
         }
     
         throw new HttpException('uhhhhhhhhhh what? @w@', HttpStatus.INTERNAL_SERVER_ERROR);
