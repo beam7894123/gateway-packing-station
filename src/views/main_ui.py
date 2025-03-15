@@ -10,6 +10,7 @@ from services.barcode_handler import BarcodeHandler
 from services.config_manager import ConfigManager
 from services.heartbeat import StatusCheckWorker
 from services.video_service import VideoCaptureService
+from services.api_service import APIService
 from views.settings_api_window import SettingsApiWindow
 from views.settings_station_window import SettingsStationWindow
 from views.settings_camera_window import SettingsCameraWindow
@@ -23,6 +24,7 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
         self.config_manager = ConfigManager()
+        self.api_service = APIService()
         self.checkFirstTimeSetup()
         self.orderLeftCheck()
         self.setMainWindowTitle()
@@ -289,16 +291,19 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
     def toggleRecordingButton(self):
         if self.video_service.is_recording:
             self.rightDownButton.setText("Stop Recording")
-            self.rightDownButton.clicked.connect(self.clear_order)
+            
+            self.rightDownButton.clicked.connect(lambda: asyncio.ensure_future(self.clear_order()))
             self.rightDownButton.setEnabled(True)
     
-    def clear_order(self):
+    async def clear_order(self):
         reply = QMessageBox.warning(self, 'Warning', 'Are you sure you want to abandon this order?\nYour progress will be lost!', 
                                      QMessageBox.No | QMessageBox.Yes, QMessageBox.No)
         if reply == QMessageBox.Yes:
             self.video_service.stop_recording()
             self.add_log_entry(f"Stopped recording (Order ID: {self.config_manager.get_order_id()})", "info")
-            self.config_manager.clear_order_id()
+            self.set_status_label(2)
+            await asyncio.sleep(1)
+            await self.clear_order_api()
             setup_order_list([], self.listItemScaned)
             setup_order_list([], self.listItemNotScaned)
             self.add_log_entry(f"Order ID: {self.config_manager.get_order_id()} abandoned!", "warning")
@@ -306,6 +311,21 @@ class MainStationWindow(QMainWindow, Ui_MainWindow):
             self.set_status_label(0)
             self.bigRightDownButtonConfig()
             self.statusBar.showMessage("Order Cleared!")
+            
+    async def clear_order_api(self):
+        try:
+            await self.api_service.post_data(
+                    '/packing-station/finish',
+                    {
+                        'orderId': self.config_manager.get_order_id(),
+                        'station': self.config_manager.get_station_id(),
+                        'status': 0
+                    },
+                )
+        except Exception as e:
+            self.add_log_entry(f"Error sending Order ID: {self.config_manager.get_order_id()} data!", "error")
+            print(f"Error sending order data: {str(e)}")
+            self.set_status_label(3)
     
     def closeEvent(self, event): # 3 if else statement lol
         reply = QMessageBox.question(self, 'Quit', 'Are you sure you want to quit?', 
