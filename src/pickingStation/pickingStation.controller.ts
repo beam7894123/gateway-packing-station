@@ -65,14 +65,14 @@ export class PickingStationController {
     return this.pickingStationService.checkScannedAndUnscannedItems(id, req);
   }
 
-  @Get('/')
-      async getAllItems(@Req() req: Request) {
-        // return await this.pickingStationService.getAllwaiting(req);
-        return 'Meow :3';
-      }
+  // @Get('/')
+  //     async getAllItems(@Req() req: Request) {
+  //       // return await this.pickingStationService.getAllwaiting(req);
+  //       return 'Meow :3';
+  //     }
 
-  @Post('/TEST')
-  async test(@Body() data: any, @Req() req: Request) {
-    return this.pickingStationService.getScannedAndUnscannedItems(data, req);
-  }
+  // @Post('/TEST')
+  // async test(@Body() data: any, @Req() req: Request) {
+  //   return this.pickingStationService.getScannedAndUnscannedItems(data, req);
+  // }
 }
