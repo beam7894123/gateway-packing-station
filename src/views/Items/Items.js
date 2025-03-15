@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { 
     CCard, CCardBody, CTable, CTableHead, CTableRow, CTableHeaderCell, 
     CTableBody, CTableDataCell, CDropdown, CDropdownToggle, CDropdownMenu, 
     CDropdownItem, CImage , CButton, CPlaceholder, CSpinner , CCardHeader, CModal, CModalHeader, CModalBody, CModalFooter
   } from "@coreui/react";
 import { useNavigate } from 'react-router-dom';
+import apiService from '../../services/ApiService.js';
 import { useDispatch } from 'react-redux';
 
 const Items = () => {
-    const apiUrl = import.meta.env.VITE_BASE_API_URL;
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -19,27 +18,27 @@ const Items = () => {
     const [selectedItemId, setSelectedItemId] = useState(null); // Add state for selected item ID
 
     useEffect(() => {
-        axios.get(apiUrl + "items")
+        apiService.get("items")
           .then(response => {
             setItems(response.data);
             setLoading(false); // Set loading to false after data is fetched
           })
           .catch(error => {
-            dispatch({ type: 'addAlert', alert: { type: 'danger', message: `Error fetching items!` } });
             console.error("Error fetching items:", error);
             setLoading(false); // Set loading to false in case of error
           });
       }, []);
 
     const handleDelete = async () => {
-        const response = await fetch(apiUrl + `items/${selectedItemId}/delete`, {
-        method: "DELETE",
-        });
-
-        if (response.ok) {
-        dispatch({ type: 'addAlert', alert: { type: 'success', message: `Delete item successfully!` } });
+        try {
+            const response = await apiService.delete(`items/${selectedItemId}/delete`);
+            if (response.status === 200) {
+                dispatch({ type: 'addAlert', alert: { type: 'success', message: 'Delete item successfully!' } });
         navigate("/items");
         window.location.reload();
+        }
+        } catch (error) {
+            console.error("Error deleting item:", error);
         }
     };
       

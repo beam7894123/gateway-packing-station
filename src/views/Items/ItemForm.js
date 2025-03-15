@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch } from 'react-redux';
-import { CCard, CCardBody, CCardHeader, CButton, CForm, CFormInput, CFormLabel, CFormTextarea, CModal, CModalBody, CModalFooter, CModalHeader, CToast, CToastBody, CToastClose } from "@coreui/react";
-import AlertNotification from "../../components/AlertNotification";
+import { CCard, CCardBody, CCardHeader, CButton, CForm, CFormInput, CFormLabel, CFormTextarea, CModal, CModalBody, CModalFooter, CModalHeader } from "@coreui/react";
+import apiService from '../../services/ApiService.js';
 
 const ItemForm = () => {
   const { id } = useParams(); // Get item ID (if editing)
@@ -25,9 +25,9 @@ const ItemForm = () => {
 
   useEffect(() => {
     if (isEditMode) {
-      fetch( apiUrl + `items/${id}`)
-        .then((res) => res.json())
-        .then((data) => {
+      apiService.get(`items/${id}`)
+        .then((res) => {
+          const data = res.data;
           setFormData({
             itemCode: data.itemCode,
             name: data.name,
@@ -37,6 +37,9 @@ const ItemForm = () => {
             image: null,
             imagePreview: data.image,
           });
+        })
+        .catch((error) => {
+          console.error("Error fetching item:", error);
         });
     }
   }, [id, isEditMode]);
@@ -70,27 +73,34 @@ const ItemForm = () => {
     }
 
     const method = isEditMode ? "PATCH" : "POST";
-    const endpoint = isEditMode ?  apiUrl + `items/${id}/update` :  apiUrl + `items/create`;
+    const endpoint = isEditMode ? `items/${id}/update` : `items/create`;
 
-    const response = await fetch(endpoint, {
+    try {
+      const response = await apiService({
       method,
-      body: form,
+        url: endpoint,
+        data: form,
     });
 
-    if (response.ok) {
+      if (response.status === 200) {
       dispatch({ type: 'addAlert', alert: { type: 'success', message: `Save item: ${formData.name} successfully!` } });
       navigate("/items"); // Redirect to item list
+    }
+    } catch (error) {
+      console.error("Error saving item:", error);
     }
   };
 
   const handleDelete = async () => {
-    const response = await fetch(apiUrl + `items/${id}/delete`, {
-      method: "DELETE",
-    });
+    try {
+      const response = await apiService.delete(`items/${id}/delete`);
 
-    if (response.ok) {
+      if (response.status === 200) {
       dispatch({ type: 'addAlert', alert: { type: 'success', message: `Delete item: ${formData.name} successfully!` } });
       navigate("/items");
+    }
+    } catch (error) {
+      console.error("Error deleting item:", error);
     }
   };
 
