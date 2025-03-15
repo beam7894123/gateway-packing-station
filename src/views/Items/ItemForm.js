@@ -78,7 +78,7 @@ const ItemForm = () => {
     });
 
     if (response.ok) {
-      dispatch({ type: 'setAlert', alert: { type: 'success', message: `Save item: ${formData.name} successfully!` } });
+      dispatch({ type: 'addAlert', alert: { type: 'success', message: `Save item: ${formData.name} successfully!` } });
       navigate("/items"); // Redirect to item list
     }
   };
@@ -89,14 +89,13 @@ const ItemForm = () => {
     });
 
     if (response.ok) {
-      dispatch({ type: 'setAlert', alert: { type: 'success', message: `Delete item: ${formData.name} successfully!` } });
+      dispatch({ type: 'addAlert', alert: { type: 'success', message: `Delete item: ${formData.name} successfully!` } });
       navigate("/items");
     }
   };
 
   return (
     <>
-    <AlertNotification />
     <CCard>
       <CCardHeader><h2>{isEditMode ? "Edit Item" : "Create Item"}</h2></CCardHeader>
       <CCardBody>

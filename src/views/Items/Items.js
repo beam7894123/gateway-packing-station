@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import AlertNotification from '../../components/AlertNotification';
 import { 
     CCard, CCardBody, CTable, CTableHead, CTableRow, CTableHeaderCell, 
     CTableBody, CTableDataCell, CDropdown, CDropdownToggle, CDropdownMenu, 
@@ -26,7 +25,7 @@ const Items = () => {
             setLoading(false); // Set loading to false after data is fetched
           })
           .catch(error => {
-            dispatch({ type: 'setAlert', alert: { type: 'danger', message: `Error fetching items!` } });
+            dispatch({ type: 'addAlert', alert: { type: 'danger', message: `Error fetching items!` } });
             console.error("Error fetching items:", error);
             setLoading(false); // Set loading to false in case of error
           });
@@ -38,7 +37,7 @@ const Items = () => {
         });
 
         if (response.ok) {
-        dispatch({ type: 'setAlert', alert: { type: 'success', message: `Delete item successfully!` } });
+        dispatch({ type: 'addAlert', alert: { type: 'success', message: `Delete item successfully!` } });
         navigate("/items");
         window.location.reload();
         }
@@ -46,7 +45,6 @@ const Items = () => {
       
     return (
     <>
-    <AlertNotification />
     <CCardHeader className="mb-4">
         <h1>Items List</h1>
     </CCardHeader>

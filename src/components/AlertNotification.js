@@ -1,5 +1,4 @@
-// src/components/AlertNotification.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { CAlert } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
@@ -13,17 +12,30 @@ const iconMap = {
 };
 
 const AlertNotification = () => {
-  const alert = useSelector((state) => state.alert);
+  const alerts = useSelector((state) => state.alerts);
   const dispatch = useDispatch();
 
-  if (!alert) return null;
+  useEffect(() => {
+    const timers = alerts.map((alert, index) =>
+      setTimeout(() => {
+        dispatch({ type: 'removeAlert', index });
+      }, 5000)
+    );
+
+    return () => timers.forEach((timer) => clearTimeout(timer));
+  }, [alerts, dispatch]);
+
+  if (alerts.length === 0) return null;
 
   return (
+    <>
+      {alerts.map((alert, index) => (
     <CAlert
+      key={index}
       color={alert.type}
       className="d-flex align-items-center"
       dismissible
-      onClose={() => dispatch({ type: 'setAlert', alert: null })}
+      onClose={() => dispatch({ type: 'removeAlert', index })}
     >
       <CIcon
         icon={iconMap[alert.type] || cilInfo}
@@ -33,6 +45,8 @@ const AlertNotification = () => {
       />
       <div>{alert.message}</div>
     </CAlert>
+      ))}
+    </>
   );
 };
 
