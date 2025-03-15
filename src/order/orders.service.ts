@@ -8,6 +8,7 @@ import { Response } from 'express';
 import { pdfPickingList } from './pdfPickingList';
 import * as path from 'path';
 import * as fs from 'fs';
+import { OrderSetStatusDto } from './dto/orders.setStatus.dto';
 
 @Injectable()
 export class OrdersService {
@@ -121,6 +122,100 @@ export class OrdersService {
       
         return order;
       }      
+
+    async updateOrder(id: number, data: OrderDto) {
+        // Fetch order with orderItems
+        const order = await this.prisma.orders.findUnique({
+            where: { id, isDeleted: 0 },
+            include: { orderItems: true },
+        });
+    
+        if (!order) {
+            throw new NotFoundException(`Orders with id ${id} not found xwx`);
+        }
+    
+            // Update the order
+            const updatedOrder = await this.prisma.$transaction(async (prisma) => {
+              // Update the order
+              const updatedOrder = await prisma.orders.update({
+                where: { id },
+                include: { orderItems: true },
+                data: {
+                  customer: data.customer,
+                  trackingNumber: data.trackingNumber || null,
+                  updatedAt: new Date(),
+                },
+              });
+            
+              // Fetch existing order items
+              const existingOrderItems = await prisma.order_items.findMany({
+                where: { orderId: id },
+              });
+            
+              // Restore stock for old items (since they will be replaced)
+              await Promise.all(
+                existingOrderItems.map(async (orderItem) => {
+                  await prisma.items.update({
+                    where: { id: orderItem.itemId },
+                    data: { quantity: { increment: orderItem.quantity } }, // Restore previous stock
+                  });
+                })
+              );
+            
+              // Remove old order items
+              await prisma.order_items.deleteMany({
+                where: { orderId: id },
+              });
+            
+              // Insert new order items and update stock
+              await Promise.all(
+                data.items.map(async (item) => {
+                  await prisma.order_items.create({
+                    data: {
+                      orderId: id,
+                      itemId: item.itemId,
+                      quantity: item.quantity,
+                    },
+                  });
+            
+                  await prisma.items.update({
+                    where: { id: item.itemId },
+                    data: { quantity: { decrement: item.quantity } }, // Deduct new stock
+                  });
+                })
+              );
+            
+              return updatedOrder;
+            });                      
+    
+        return {
+          "message": `Orders with id ${id} has been updated successfully! ^w^`,
+          "statusCode": 200
+      };
+    }    
+
+    async setStatusOrder(id: number, data: OrderSetStatusDto) {
+        const order = await this.prisma.orders.findUnique({
+          where: { id, isDeleted: 0 },
+        });
+      
+        if (!order) {
+          throw new NotFoundException(`Orders with id ${id} not found xwx`);
+        }
+      
+        await this.prisma.orders.update({
+          where: { id },
+          data: {
+            status: data.status,
+            updatedAt: new Date(),
+          },
+        });
+      
+        return {
+          message: `Orders with id ${id} has been updated successfully! ^w^`,
+          statusCode: 200,
+        }
+    }
 
     async softDeleteOrders(id: number) {
         const orders = await this.prisma.orders.findUnique({
