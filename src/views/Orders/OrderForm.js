@@ -12,6 +12,7 @@ const OrderForm = () => {
 
   const [formData, setFormData] = useState({
     customer: "",
+    customerEmail: "",
     trackingNumber: "",
     status: 1,
     items: [],
@@ -28,6 +29,7 @@ const OrderForm = () => {
           const data = res.data;
           setFormData({
             customer: data.customer,
+            customerEmail: data.customerEmail,
             trackingNumber: data.trackingNumber,
             status: data.status,
             items: data.orderItems.map(item => ({ itemId: item.itemId, quantity: item.quantity })),
@@ -72,7 +74,7 @@ const OrderForm = () => {
 
   const handleQuantityChange = (e, index) => {
     const updatedItems = [...formData.items];
-    updatedItems[index].quantity = parseInt(e.target.value, 10);
+    updatedItems[index].quantity = parseInt(e.target.value, 10) || 1;
     setFormData((prev) => ({
       ...prev,
       items: updatedItems,
@@ -141,7 +143,11 @@ const OrderForm = () => {
         <CForm onSubmit={handleSubmit}>
           <div className="mb-3">
               <CFormLabel>Customer Name</CFormLabel>
-              <CFormInput name="customer" value={formData.customer} onChange={handleChange} />
+              <CFormInput required name="customer" value={formData.customer} onChange={handleChange} />
+          </div>
+          <div className="mb-3">
+              <CFormLabel>Customer Email</CFormLabel>
+              <CFormInput required name="customerEmail" type="email" value={formData.customerEmail} onChange={handleChange} />
           </div>
           <div className="mb-3">
               <CFormLabel>Tracking Number</CFormLabel>
