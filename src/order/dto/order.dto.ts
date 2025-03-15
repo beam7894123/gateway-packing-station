@@ -7,6 +7,10 @@ export class OrderDto {
   customer: string;
 
   @IsString()
+  @IsNotEmpty()
+  customerEmail: string;
+
+  @IsString()
   @IsOptional()
   trackingNumber: string;
 

@@ -86,6 +86,7 @@ export class OrdersService {
           const order = await prisma.orders.create({
             data: {
               customer: data.customer,
+              customerEmail: data.customerEmail || null,
               status: 1, // Default status (received)
               trackingNumber: data.trackingNumber || null,
               createdAt: new Date(),
@@ -141,8 +142,9 @@ export class OrdersService {
                 where: { id },
                 include: { orderItems: true },
                 data: {
-                  customer: data.customer,
-                  trackingNumber: data.trackingNumber || null,
+                  customer: data.customer || order.customer,
+                  customerEmail: data.customerEmail || order.customerEmail,
+                  trackingNumber: data.trackingNumber || order.trackingNumber,
                   updatedAt: new Date(),
                 },
               });
