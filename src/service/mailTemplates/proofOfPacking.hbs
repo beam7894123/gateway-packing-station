@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Proof of Packing Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: auto;
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #007bff;
+        }
+        .header h1 {
+            color: #333;
+        }
+        .content {
+            padding: 20px 0;
+            color: #555;
+            text-align: center;
+        }
+        .video-container {
+            margin: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #777;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Proof of Packing Confirmation</h1>
+            <p>Order #{{orderId}}</p>
+        </div>
+        
+        <div class="content">
+            <h2 style="text-align: left;">Dear {{customerName}},</h2>
+            <p>We are pleased to inform you that your order has been packed and is ready for shipment.</p>
+            
+            <div class="video-container">
+                <p>📦 Below is the proof of packing video:</p>
+                <video width="100%" controls>
+                    <source src="{{proofVideoUrl}}" type="video/mp4">
+                    Look like your browser does not support embedded videos.
+                </video>
+            </div>
+
+            <p>If you cannot view the video, click the link below:</p>
+            <p style="text-align: center;">
+                <a href="{{proofVideoUrl}}" class="button" style="color: white;" >Watch Proof Video</a>
+            </p>
+
+            <p>If you have any questions, please don't contact our support team.</p>
+            <p>Thank you for shopping with us!</p>
+        </div>
+
+        <div class="footer">
+            <p>&copy; {{year}} PSG (Demo). All rights? reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
