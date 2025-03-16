@@ -18,8 +18,18 @@ export class PackingOrderController {
     }
 
     @Delete(':id/delete')
-    async deleteScan(@Param('id') id: number,) {
+    async deleteScan(@Param('id') id: number) {
         return this.packingOrderService.softDeletePackingProof(id);
+    }
+
+    @Post(':id/mail/send')
+    async sendProofToMailById(@Param('id') id: number, @Req() req: Request) {
+        return await this.packingOrderService.sendProofToMailById(id, req);
+    }
+
+    @Post('mail/send')
+    async sendMail(@Body() body: any) {
+        return await this.packingOrderService.sendMail(body);
     }
 
 
