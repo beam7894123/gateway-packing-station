@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import apiService from '../../services/ApiService.js';
 import { useDispatch } from 'react-redux';
 
-const Items = () => {
+const Orders = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -30,7 +30,7 @@ const Items = () => {
     
     const statusLabels = {
       1: 'Received',
-      2: 'Paid',
+      2: 'Paid (Ready for Packing)',
       3: 'Packing',
       4: 'Packed',
       5: 'In Transit',
@@ -49,18 +49,18 @@ const Items = () => {
           });
       }, []);
 
-    const handlePrintPackingList = async (itemId) => {
+    const handlePrintPickingList = async (itemId) => {
         setButtonLoading(true);
         setSelectedItemId(itemId); // Ensure selectedItemId is set
         try {
             const response = await apiService.get(`orders/${itemId}/picking-list`);
             if (response.status === 200) {
-                dispatch({ type: 'addAlert', alert: { type: 'success', message: 'Print packing list successfully!' } });
+                dispatch({ type: 'addAlert', alert: { type: 'success', message: 'Print picking list successfully!' } });
                 window.open(response.data.url, '_blank'); // Open the URL in a new tab
         }
         } catch (error) {
-            dispatch({ type: 'addAlert', alert: { type: 'danger', message: 'Error printing packing list!' } });
-            console.error("Error printing packing list:", error);
+            dispatch({ type: 'addAlert', alert: { type: 'danger', message: 'Error printing picking list!' } });
+            console.error("Error printing picking list:", error);
         } finally {
             setButtonLoading(false); // Set button loading state to false
         }
@@ -161,8 +161,10 @@ const Items = () => {
                         <CButton color="primary" onClick={() => navigate(`/order/${item.id}`)}>{buttonLoading ? <CSpinner size="sm" /> : 'Edit'}</CButton>
                         <CDropdownToggle color="primary" />
                         <CDropdownMenu>
-                          <CDropdownItem onClick={() => handlePrintPackingList(item.id)}>
-                            {buttonLoading ? <CSpinner size="sm" /> : 'Print Packing list'}
+                          <CDropdownItem onClick={() => handlePrintPickingList(item.id)}>
+                            {
+                            buttonLoading ? <CSpinner size="sm" /> : 'Print picking list'
+                            }
                           </CDropdownItem>
                           <CDropdownItem onClick={() => { setSelectedItemId(item.id); setShowModal(true); }}>Delete</CDropdownItem>
                           <CDropdownDivider />
@@ -204,4 +206,4 @@ const Items = () => {
   )
 }
 
-export default Items
+export default Orders

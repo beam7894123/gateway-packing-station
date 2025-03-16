@@ -1,53 +1,43 @@
 import React from 'react'
-
+import { useNavigate } from 'react-router-dom';
 import {
-  CAvatar,
   CButton,
-  CButtonGroup,
-  CCard,
-  CCardBody,
-  CCardFooter,
-  CCardHeader,
+  CCarousel,
+  CCarouselItem,
   CCol,
-  CProgress,
-  CRow,
-  CTable,
-  CTableBody,
-  CTableDataCell,
-  CTableHead,
-  CTableHeaderCell,
-  CTableRow,
+  CImage,
+  CRow
 } from '@coreui/react'
-import CIcon from '@coreui/icons-react'
-import {
-  cibCcAmex,
-  cibCcApplePay,
-  cibCcMastercard,
-  cibCcPaypal,
-  cibCcStripe,
-  cibCcVisa,
-  cibGoogle,
-  cibFacebook,
-  cibLinkedin,
-  cifBr,
-  cifEs,
-  cifFr,
-  cifIn,
-  cifPl,
-  cifUs,
-  cibTwitter,
-  cilCloudDownload,
-  cilPeople,
-  cilUser,
-  cilUserFemale,
-} from '@coreui/icons'
+
 
 const Dashboard = () => {
+  const navigate = useNavigate();
 
   return (
     <>
-      <CCard className="mb-4">
-      </CCard>
+    <h1 className="text-center pb-2">Welcome to PSG Admin panel! (Demo)</h1>
+    <CRow>
+      <CCol>
+        <CButton color="primary" className="w-100" onClick={() => navigate(`/items`)} >Items list</CButton>
+      </CCol>
+      <CCol>
+        <CButton color="primary" className="w-100" onClick={() => navigate(`/orders`)} >Orders list</CButton>
+      </CCol>
+      <CCol>
+        <CButton color="primary" className="w-100" onClick={() => navigate(`/packing`)} >Packing rec</CButton>
+      </CCol>
+    </CRow>
+      <CCarousel indicators animate autoPlay={3000} className='py-4'>
+        <CCarouselItem>
+          <CImage className="d-block w-100" src="../images/react.jpg" alt="slide 1" />
+        </CCarouselItem>
+        <CCarouselItem>
+          <CImage className="d-block w-100" src="../images/vue.jpg" alt="slide 2" />
+        </CCarouselItem>
+        <CCarouselItem>
+          <CImage className="d-block w-100" src="../images/angular.jpg" alt="slide 3" />
+        </CCarouselItem>
+      </CCarousel>
     </>
   )
 }
