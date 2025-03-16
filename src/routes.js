@@ -5,6 +5,7 @@ const Orders = React.lazy(() => import('./views/Orders/Orders'))
 const OrderForm = React.lazy(() => import('./views/Orders/OrderForm'))
 const Items = React.lazy(() => import('./views/Items/Items'))
 const ItemForm = React.lazy(() => import('./views/Items/ItemForm'))
+const Packing = React.lazy(() => import('./views/packing/Packings'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -15,6 +16,7 @@ const routes = [
   { path: '/items', name: 'Items', element: Items },
   { path: '/item/new', name: 'New Item', element: ItemForm },
   { path: '/item/:id', name: 'Edit Item', element: ItemForm },
+  { path: '/packing', name: 'Packing proof list', element: Packing },
 
   
 ]
