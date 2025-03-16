@@ -5,7 +5,7 @@ import { OrderDto } from './dto/order.dto';
 import { Request } from 'express';
 import { getBaseUrl } from 'src/utils';
 import { Response } from 'express';
-import { pdfPickingList } from './pdfPickingList';
+import { pdfPickingList } from '../service/pdfPickingList.service';
 import * as path from 'path';
 import * as fs from 'fs';
 import { OrderSetStatusDto } from './dto/orders.setStatus.dto';
