@@ -39,7 +39,7 @@ class ItemDelegate(QStyledItemDelegate):
 
         # Draw text next to the image (increase font size)
         text_rect = QRect(image_rect.right() + 10, option.rect.top(), option.rect.width() - image_rect.width() - 20, option.rect.height())
-        text = f"{order_item.name} - ${order_item.price} x {order_item.quantity}"
+        text = f"{order_item.name} - {order_item.price} Bath  x{order_item.quantity}"
 
         # Set a bigger font for the text
         font = QFont()
