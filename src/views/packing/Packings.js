@@ -18,6 +18,7 @@ const Packing = () => {
     const [buttonLoading, setButtonLoading] = useState(false);
     const [showModalDelete, setShowModalDelete] = useState(false);
     const [showModalResendEmail, setShowModalResendEmail] = useState(false);
+    const [showModalSendEmail, setShowModalSendEmail] = useState(false);
     const [selectedItemId, setSelectedItemId] = useState(null);
     
     const statusColors = {
@@ -61,6 +62,23 @@ const Packing = () => {
             }
         } catch (error) {
             console.error("Error resending email:", error);
+            setLoading(false);
+        }
+    };
+
+    const handleSendEmail = async () => {
+        try {
+            setShowModalResendEmail(false);
+            setLoading(true);
+            const response = await apiService.post(`packing/${selectedItemId}/mail/send`);
+            if (response.status === 200 || response.status === 201) {
+                dispatch({ type: 'addAlert', alert: { type: 'success', message: 'Send email successfully!' } });
+                setLoading(false);
+                navigate("/packing");
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error("Error sending email:", error);
             setLoading(false);
         }
     };
@@ -128,6 +146,9 @@ const Packing = () => {
                                                 { item.status === 3 && (
                                                   <CDropdownItem onClick={() => { setSelectedItemId(item.id); setShowModalResendEmail(true); }}>Resend Email</CDropdownItem>
                                                 )}
+                                                { item.status === 2 && (
+                                                  <CDropdownItem onClick={() => { setSelectedItemId(item.id); setShowModalSendEmail(true); }}>Send Email</CDropdownItem>
+                                                )}
                                                 <CDropdownItem onClick={() => { setSelectedItemId(item.id); setShowModalDelete(true); }}>Delete</CDropdownItem>
                                               </CDropdownMenu>
                                             </CDropdown>
@@ -171,6 +192,20 @@ const Packing = () => {
             </CButton>
             <CButton color="primary" onClick={handleResendEmail}>
                 Resend
+            </CButton>
+            </CModalFooter>
+        </CModal>
+
+        {/* Send Email Modal */}
+        <CModal visible={showModalSendEmail} onClose={() => setShowModalSendEmail(false)}>
+            <CModalHeader>Resend Email</CModalHeader>
+            <CModalBody>Are you sure you want to send the email?</CModalBody>
+            <CModalFooter>
+            <CButton color="secondary" onClick={() => setShowModalSendEmail(false)}>
+                Cancel
+            </CButton>
+            <CButton color="primary" onClick={handleSendEmail}>
+                Send
             </CButton>
             </CModalFooter>
         </CModal>

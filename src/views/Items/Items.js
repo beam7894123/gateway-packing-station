@@ -81,13 +81,23 @@ const Items = () => {
                 {items.map((item, index) => (
                   <CTableRow key={item.id}>
                     <CTableDataCell>
-                      <CImage 
-                        src={item.image} 
-                        alt={item.name} 
-                        width={100} 
-                        height={100} 
-                        style={{ objectFit: "cover", borderRadius: "5px" }} 
-                      />
+                      {item.image ? (
+                        <CImage 
+                          src={item.image} 
+                          alt={item.name} 
+                          width={100} 
+                          height={100} 
+                          style={{ objectFit: "cover", borderRadius: "5px" }} 
+                        />
+                      ) : (
+                        <CImage 
+                          src="../images/404.png" 
+                          alt={item.name} 
+                          width={100} 
+                          height={100} 
+                          style={{ objectFit: "cover", borderRadius: "5px" }} 
+                        />
+                      )}
                     </CTableDataCell>
                     <CTableDataCell>{item.name}</CTableDataCell>
                     <CTableDataCell>{item.price.toLocaleString()} baht</CTableDataCell>

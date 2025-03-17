@@ -1,4 +1,5 @@
 import React from 'react'
+import Page404 from './views/pages/page404/Page404'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Orders = React.lazy(() => import('./views/Orders/Orders'))
@@ -9,6 +10,8 @@ const Packing = React.lazy(() => import('./views/packing/Packings'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
+  { path: '*', name: 'Page404', element: Page404 },
+  
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
   { path: '/orders', name: 'Orders', element: Orders },
   { path: '/order/new', name: 'New Order', element: OrderForm },
