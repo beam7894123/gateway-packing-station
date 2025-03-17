@@ -26,11 +26,4 @@ export class PackingOrderController {
     async sendProofToMailById(@Param('id') id: number, @Req() req: Request) {
         return await this.packingOrderService.sendProofToMailById(id, req);
     }
-
-    @Post('mail/send')
-    async sendMail(@Body() body: any) {
-        return await this.packingOrderService.sendMail(body);
-    }
-
-
 }

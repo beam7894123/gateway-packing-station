@@ -1,12 +1,17 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Request } from 'express';
 import { StationDto } from './dto/station.dto';
 import { getBaseUrl } from 'src/utils';
+import { PackingOrderService } from 'src/packOrder/packOrder.service';
 
 @Injectable()
 export class PickingStationService {
-    constructor(private prisma: PrismaService) {}
+    constructor(
+        private prisma: PrismaService,
+        @Inject(forwardRef(() => PackingOrderService))
+        private readonly packingOrderService: PackingOrderService
+    ) {}
 
     async checkOrderPackingProof(orderId: number, req: Request) {
         const packing_proof = await this.prisma.packing_proofs.findFirst({
@@ -197,7 +202,7 @@ export class PickingStationService {
         return this.getScannedAndUnscannedItems(packingProofId, req);
     }
 
-    async finishScan(data: StationDto) {
+    async finishScan(data: StationDto, req: Request) {
         const packingProof = await this.prisma.packing_proofs.findFirst({
             where: {
                 orderId: data.orderId,
@@ -228,6 +233,8 @@ export class PickingStationService {
                 where: { id: data.orderId },
                 data: { status: 4 }, // 4 means packed
             });
+
+            this.packingOrderService.sendProofToMailById(packingProof.id, req);
 
             return {
                 message: 'Scan finished successfully! uwu',
@@ -298,10 +305,10 @@ export class PickingStationService {
         };
     }
     
-    async getAllwaiting(req: Request) {
-        // const result = await this.prisma.pickingStation.findMany();
-        // return result;
-        return 'Meow :3';
-    }
+    // async getAllwaiting(req: Request) {
+    //     // const result = await this.prisma.pickingStation.findMany();
+    //     // return result;
+    //     return 'Meow :3';
+    // }
 
 }

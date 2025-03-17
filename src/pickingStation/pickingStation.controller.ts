@@ -32,9 +32,9 @@ export class PickingStationController {
 
   @Post('/finish')
   @UseInterceptors(videoUploadInterceptor('video'))
-  async finishScan(@Body() data: StationDto, @UploadedFile() video?: Express.Multer.File) {
+  async finishScan(@Req() req: Request, @Body() data: StationDto, @UploadedFile() video?: Express.Multer.File) {
     if (!video) {
-      return this.pickingStationService.finishScan(data); // No video uploaded :<
+      return this.pickingStationService.finishScan(data, req); // No video uploaded :<
     }
 
     const videoPath = `/assets/uploads/videos/${video.filename}`;
@@ -42,7 +42,7 @@ export class PickingStationController {
     return await this.pickingStationService.finishScan({
       ...data,
       video: videoPath,
-    });
+    }, req);
   }
 
   @Post('/restart')

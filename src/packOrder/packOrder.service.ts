@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Request } from 'express';
 import { PickingStationService } from 'src/pickingStation/pickingStation.service';
@@ -8,6 +8,7 @@ import { MailingService } from 'src/service/mailing.service';
 @Injectable()
 export class PackingOrderService {
     constructor(private prisma: PrismaService,
+        @Inject(forwardRef(() => PickingStationService))
         private readonly pickingStationService: PickingStationService,
         private readonly mailingService: MailingService,
     ) {} 
@@ -47,6 +48,20 @@ export class PackingOrderService {
     }
 
     async softDeletePackingProof(id: number) {
+        const packing_proofs = await this.prisma.packing_proofs.findUnique({
+            where: { id, isDeleted: 0 }
+        });
+
+        if (!packing_proofs) {
+            throw new NotFoundException(`Packing proof with id ${id} not found xwx`);
+        }
+
+        await this.prisma.orders.update({
+            where: { id: packing_proofs.orderId },
+            data: { status: 2 } // Set the order back to Paid
+        });
+
+
         return await this.pickingStationService.softDeletePackingProof(id);
     }
 
@@ -73,9 +88,10 @@ export class PackingOrderService {
         if (!packingFinal.order.customerEmail) {
             throw new HttpException(`Customer email not found for order ${packing.order.id} xwx`, HttpStatus.BAD_REQUEST);
         }
-
-        if (!packingFinal.video) {
-            throw new HttpException(`Proof video not found for order ${packing.order.id} xwx`, HttpStatus.BAD_REQUEST);
+        
+        // If the proof video is not found, throw an error and brick the process XD
+        if (!packingFinal.video) { 
+             throw new HttpException(`Proof video not found for order ${packing.order.id} xwx`, HttpStatus.BAD_REQUEST);
         }
 
         try {
@@ -90,9 +106,4 @@ export class PackingOrderService {
             throw new HttpException(`Failed to send proof to ${packing.order.customerEmail} xwx`, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    async sendMail(body: any) {
-        await this.mailingService.sendTestEmail(body.to, body.name, body.confirmationLink);
-        return { message: `Mail sent to ${body.to} successfully ^w^` };
-    }    
 }
