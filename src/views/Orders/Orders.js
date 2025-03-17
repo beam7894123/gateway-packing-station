@@ -152,7 +152,7 @@ const Orders = () => {
       <CCard className="mb-2">
         <CCardBody>
           <div className="d-grid gap-2">
-            {items.length > 0 ? (
+            {loading === false ? (
               <CButton onClick={() => navigate(`/order/new`)} color="primary">
                 + Add Order
               </CButton>

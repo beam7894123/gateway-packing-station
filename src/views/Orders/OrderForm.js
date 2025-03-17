@@ -265,7 +265,7 @@ const OrderForm = () => {
                   return (
                     <CTableRow key={index}>
                       <CTableDataCell>
-                        {item.image ? (
+                        {itemDetails.image ? (
                           <CImage
                             src={itemDetails?.image}
                             alt={itemDetails?.name}
