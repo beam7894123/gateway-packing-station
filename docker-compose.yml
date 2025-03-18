@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: PSG-API
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - FRONTEND_ADMIN_URL=${FRONTEND_ADMIN_URL}
+      - BASE_URL=${BASE_URL}
+      - PORT=${PORT}
+      - MAIL_HOST=${MAIL_HOST}
+      - MAIL_PORT=${MAIL_PORT}
+      - MAILER_SECURE=${MAILER_SECURE}
+      - MAIL_USER=${MAIL_USER}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+    volumes:
+      - .:/app
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
