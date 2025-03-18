@@ -112,7 +112,7 @@ export class PickingStationService {
         });
         let orderItemQuantity = 0;
         if (orderItem) {
-            orderItemQuantity = orderItem.quantity;
+            orderItemQuantity = Number(orderItem.quantity) || 0;
         }
         if ((scannedItemCount + 1) > orderItemQuantity) {
             throw new HttpException('This item has already been scanned! >:<', HttpStatus.FORBIDDEN);
@@ -169,28 +169,28 @@ export class PickingStationService {
     
         // Categorize scanned and unscanned items with details
         for (const orderItem of orderItems) {
-            const scannedQuantity = scannedItemMap.get(orderItem.itemId) || 0;
-            const unscannedQuantity = orderItem.quantity - scannedQuantity;
-    
+            const scannedQuantity = Number(scannedItemMap.get(orderItem.itemId)) || 0;
+            const unscannedQuantity = Number(orderItem.quantity - scannedQuantity) || 0;
+        
             const itemDetails = {
                 itemId: orderItem.itemId,
-                name: orderItem.item.name,
-                description: orderItem.item.description,
-                image: orderItem.item.image ? `${baseUrl}${orderItem.item.image}` : null,
-                price: orderItem.item.price,
-            };
-    
+                name: orderItem.item?.name || 'Unknown',
+                description: orderItem.item?.description || null,
+                image: orderItem.item?.image ? `${baseUrl}${orderItem.item.image}` : null,
+                price: orderItem.item?.price ?? null,
+            };            
+        
             if (scannedQuantity > 0) {
                 scanned.push({
                     ...itemDetails,
-                    scannedQuantity,
+                    scannedQuantity: Number(scannedQuantity),
                 });
             }
-    
+        
             if (unscannedQuantity > 0) {
                 unscanned.push({
                     ...itemDetails,
-                    unscannedQuantity,
+                    unscannedQuantity: Number(unscannedQuantity),
                 });
             }
         }
