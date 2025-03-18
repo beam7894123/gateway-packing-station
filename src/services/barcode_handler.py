@@ -59,7 +59,7 @@ class BarcodeHandler(QObject):
                         self.log_signal.emit(f"Order ID: {order_id} loaded!", "success")
                         config_manager.set_order_id(order_id)
                         
-                        video_service.toggle_recording()
+                        video_service.start_recording()
                         set_status_label(1)
                         self.log_signal.emit(f"Start Recording (Order ID: {order_id})", "info")
                     else:
@@ -91,17 +91,17 @@ class BarcodeHandler(QObject):
                         msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
                         msg_box.setDefaultButton(QMessageBox.No)
 
-                    # Create a QTimer to close the dialog after 10 seconds
-                    timer = QTimer(msg_box)
-                    timer.setInterval(5000)  # 10 seconds
-                    timer.setSingleShot(True)
-                    timer.timeout.connect(msg_box.defaultButton().animateClick)
-                    timer.start()
-                    timer.timeout.connect(lambda: msg_box.done(QMessageBox.No))
-                    reply = msg_box.exec()
+                        # Create a QTimer to close the dialog after 10 seconds
+                        timer = QTimer(msg_box)
+                        timer.setInterval(5000)  # 10 seconds
+                        timer.setSingleShot(True)
+                        timer.timeout.connect(msg_box.defaultButton().animateClick)
+                        timer.start()
+                        timer.timeout.connect(lambda: msg_box.done(QMessageBox.No))
+                        reply = msg_box.exec()
 
-                    if reply == QMessageBox.No:
-                        return
+                        if reply == QMessageBox.No:
+                            return
                 except Exception as e:
                     self.log_signal.emit(f"Error: {order_id} | {e('message', 'Unknown error')}", "error")
                     set_status_label(3)
