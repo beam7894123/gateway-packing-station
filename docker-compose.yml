@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: PSG-Admin-panel-DEMO
+    ports:
+      - "3001:80"
+    environment:
+      VITE_BASE_API_URL: http://localhost:3001/
