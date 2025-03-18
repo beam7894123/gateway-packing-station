@@ -14,14 +14,22 @@ export class PackingOrderService {
     ) {} 
     
 
-    async getAllOrders(req: Request) {
+    async getAllOrders(req: Request, { status, createdAt }: { status?: string, createdAt?: string }) {
         const baseUrl = getBaseUrl(req);
-        const packing = await this.prisma.packing_proofs.findMany({
+        let packing = await this.prisma.packing_proofs.findMany({
             where: { isDeleted: 0 },
             include: {
                 order: true,
             }
         });
+
+        if (status) {
+            packing = packing.filter(proof => proof.status === parseInt(status));
+        }
+
+        if (createdAt) {
+            packing = packing.filter(proof => proof.createdAt.toISOString().includes(createdAt));
+        }
 
         return packing.map(proof => ({
             ...proof,

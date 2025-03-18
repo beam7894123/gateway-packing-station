@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { Request } from 'express';
 import { PackingOrderService } from './packOrder.service';
 
@@ -8,8 +8,11 @@ export class PackingOrderController {
     private readonly packingOrderService: PackingOrderService,
   ) {}
     @Get('/')
-    async getAllItems(@Req() req: Request) {
-      return await this.packingOrderService.getAllOrders(req);
+    async getAllItems(
+      @Req() req: Request,
+      @Query('status') status?: string,
+      @Query('createdAt') createdAt?: string) {
+      return await this.packingOrderService.getAllOrders(req, { status, createdAt });
     }  
 
     @Get(':id')

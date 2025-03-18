@@ -14,10 +14,18 @@ import { OrderSetStatusDto } from './dto/orders.setStatus.dto';
 export class OrdersService {
     constructor(private prisma: PrismaService) {}
     
-    async getAllOrders (req: Request) {
-        const orders = await this.prisma.orders.findMany({
+    async getAllOrders (req: Request, { status, createdAt }: { status?: string, createdAt?: string }) {
+        let orders = await this.prisma.orders.findMany({
           where: { isDeleted: 0 }
         });
+
+        if (status) {
+            orders = orders.filter(order => order.status === parseInt(status));
+        }
+
+        if (createdAt) {
+            orders = orders.filter(order => order.createdAt.toISOString().startsWith(createdAt));
+        }
       
         return orders
       }

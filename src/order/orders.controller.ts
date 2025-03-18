@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Req, UploadedFile, UseInterceptors, Delete, Res } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Req, UploadedFile, UseInterceptors, Delete, Res, Query } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { OrdersService } from './orders.service';
 import { OrderDto as OrderDto } from './dto/order.dto';
@@ -9,8 +9,10 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Get('/')
-    async getAllItems(@Req() req: Request) {
-      return await this.ordersService.getAllOrders(req);
+    async getAllItems(@Req() req: Request,
+      @Query('status') status?: string,
+      @Query('createdAt') createdAt?: string) {
+      return await this.ordersService.getAllOrders(req, { status, createdAt });
     }  
 
   @Get(':id')
