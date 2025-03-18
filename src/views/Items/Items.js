@@ -131,7 +131,7 @@ const Items = () => {
                     </CTableDataCell>
                     <CTableDataCell>{item.name}</CTableDataCell>
                     <CTableDataCell>{item.price.toLocaleString()} baht</CTableDataCell>
-                    <CTableDataCell>{item.quantity}</CTableDataCell>
+                    <CTableDataCell>{item.quantity.toLocaleString()}</CTableDataCell>
                     <CTableDataCell>
                       <CDropdown variant="btn-group">
                         <CButton color="primary" onClick={() => navigate(`/item/${item.id}`)}>

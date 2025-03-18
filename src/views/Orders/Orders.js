@@ -23,6 +23,11 @@ import {
   CModalFooter,
   CBadge,
   CDropdownDivider,
+  CFormSelect,
+  CFormInput,
+  CFormLabel,
+  CRow,
+  CCol,
 } from '@coreui/react'
 import { useNavigate } from 'react-router-dom'
 import apiService from '../../services/ApiService.js'
@@ -38,6 +43,8 @@ const Orders = () => {
   const [selectedItemId, setSelectedItemId] = useState(null)
   const [buttonLoading, setButtonLoading] = useState(false)
   const [sortOrder, setSortOrder] = useState('asc') // State to manage sorting order
+  const [statusFilter, setStatusFilter] = useState('') // State to manage status filter
+  const [dateFilter, setDateFilter] = useState('') // State to manage date filter
 
   const statusColors = {
     1: 'secondary', // received
@@ -49,7 +56,7 @@ const Orders = () => {
   }
 
   const statusLabels = {
-    1: 'Received',
+    1: 'Payment is Pending',
     2: 'Paid (Ready for Packing)',
     3: 'Packing',
     4: 'Packed',
@@ -69,6 +76,10 @@ const Orders = () => {
         setLoading(false)
       })
   }, [])
+
+  useEffect(() => {
+    handleFilter()
+  }, [statusFilter, dateFilter])
 
   const handlePrintPickingList = async (itemId) => {
     setButtonLoading(true)
@@ -144,6 +155,27 @@ const Orders = () => {
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
   }
 
+  const handleClearFilter = () => {
+    setStatusFilter('')
+    setDateFilter('')
+  }
+
+  const handleFilter = () => {
+    apiService
+      .get('orders', {
+        params: {
+          status: statusFilter,
+          createdAt: dateFilter,
+        },
+      })
+      .then((response) => {
+        setItems(response.data)
+      })
+      .catch((error) => {
+        console.error('Error fetching filtered items:', error)
+      })
+  }
+
   return (
     <>
       <CCardHeader className="mb-4">
@@ -172,6 +204,40 @@ const Orders = () => {
 
       <CCard className="mb-4">
         <CCardBody>
+          <div className="mb-3">
+            <CRow className="align-items-center">
+              <CCol>
+                <CFormLabel className="me-2">Status:</CFormLabel>
+                <CFormSelect
+                  className="me-2"
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                >
+                  <option value="">All Statuses</option>
+                  <option value="1">Payment is Pending</option>
+                  <option value="2">Paid (Ready for Packing)</option>
+                  <option value="3">Packing</option>
+                  <option value="4">Packed</option>
+                  <option value="5">In Transit</option>
+                  <option value="6">Complete</option>
+                </CFormSelect>
+              </CCol>
+              <CCol>
+                <CFormLabel className="me-2">Created Date:</CFormLabel>
+                <CFormInput
+                  type="date"
+                  className="me-2"
+                  value={dateFilter}
+                  onChange={(e) => setDateFilter(e.target.value)}
+                />
+              </CCol>
+              <CCol xs="auto" className="mt-4">
+                <CButton color="secondary" onClick={handleClearFilter}>
+                  Clear
+                </CButton>
+              </CCol>
+            </CRow>
+          </div>
           {loading ? (
             <div className="text-center">
               <CSpinner color="primary" />
@@ -186,6 +252,7 @@ const Orders = () => {
                   <CTableHeaderCell>Customer Name</CTableHeaderCell>
                   <CTableHeaderCell>Status</CTableHeaderCell>
                   <CTableHeaderCell>Tracking Number</CTableHeaderCell>
+                  <CTableHeaderCell>Created</CTableHeaderCell>
                   <CTableHeaderCell></CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
@@ -198,6 +265,7 @@ const Orders = () => {
                       <CBadge color={statusColors[item.status]}>{statusLabels[item.status]}</CBadge>
                     </CTableDataCell>
                     <CTableDataCell>{item.trackingNumber || 'None'}</CTableDataCell>
+                    <CTableDataCell>{new Date(item.createdAt).toLocaleString()}</CTableDataCell>
                     <CTableDataCell>
                       <CDropdown variant="btn-group">
                         <CButton
