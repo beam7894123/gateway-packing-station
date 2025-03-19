@@ -8,7 +8,10 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 
 # Install ALL dependencies (including devDependencies)
-RUN npm install 
+RUN npm install
+
+# Copy .env file for environment variables
+COPY .env ./
 
 # Copy the rest of the files
 COPY . .

@@ -7,6 +7,6 @@ services:
       dockerfile: Dockerfile
     container_name: PSG-Admin-panel-DEMO
     ports:
-      - "3001:80"
+      - "3030:80"
     environment:
-      VITE_BASE_API_URL: http://localhost:3001/
+      - VITE_BASE_API_URL=${VITE_BASE_API_URL}
