@@ -1,10 +1,11 @@
 # PSG API
 
-<div style="display: flex; justify-content: center; align-items: center;">
-  <img src="./images/logo2.png" alt="PSG Logo" style="height: 100px;" />
-  <h1 style="font-size: 3em; margin-left: 10px;">+</h1>
+<div align="center" style="display: flex; justify-content: center; align-items: center;">
+  <img src="./images/logo2.png" alt="PSG Logo" style="height: 100px; margin-left: 10px;" />
+  <h3>+</h3>
   <img src="./images/logo.png" alt="PSG Admin Logo" style=" height: 100px; margin-left: 10px;" />
-  <h1 style="font-size: 3em; margin-left: 10px;">+ API</h1>
+  <h3>+</h3>
+  <h3>API</h3>
 </div>
 
 This is a API for Packing Station Gateway & Packing Station Gateway Admin. It uses [NestJS](https://nestjs.com) framework. with [Prisma](https://www.prisma.io) as ORM.
