@@ -111,6 +111,7 @@ export class PackingOrderService {
             return { message: `Proof sent to ${packing.order.customerEmail} successfully ^w^` };
         }
         catch (error) {
+            console.error(`Failed to send proof to ${packing.order.customerEmail}:`, error);
             throw new HttpException(`Failed to send proof to ${packing.order.customerEmail} xwx`, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
