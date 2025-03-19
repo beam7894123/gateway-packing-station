@@ -140,6 +140,13 @@ class VideoCaptureService:
             cap.release()  # Ensure proper cleanup
             print(f"Camera init failed attempt {i+1}/{retries}")
             time.sleep(delay)
+            
+        print("All retries failed. Attempting to open the default camera...")
+        cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+        if cap.isOpened() and cap.read()[0]:
+            self.config_manager.set_camera_index(0)  # Reset camera index to default
+            return cap
+        cap.release()
         return cv2.VideoCapture()
         
     def init_video(self):

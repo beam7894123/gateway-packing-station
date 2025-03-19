@@ -2,7 +2,8 @@ import asyncio
 from services.api_service import APIService
 from components.order_list import OrderItem, setup_order_list
 from services.config_manager import ConfigManager
-from PySide6.QtCore import Signal, QObject
+from PySide6.QtCore import Signal, QObject, QTimer
+from PySide6.QtWidgets import QMessageBox
 
 class BarcodeHandler(QObject):
     
@@ -23,9 +24,13 @@ class BarcodeHandler(QObject):
                        listItemNotScaned,
                        statusBar,
                        set_status_label,):
+        # It only starts recording when the barcode starts with "start|[NUMBER]" if in the future we change the barcode format we need to change this =w=
         if barcode_text.startswith("start|"):
             _, order_id = barcode_text.split('|', 1)
             if order_id.isdigit():
+                if config_manager.get_order_id():
+                    self.log_signal.emit(f"Error: Order ID {config_manager.get_order_id()} already loaded!", "error")
+                    return
                 try:
                     self.log_signal.emit(f"Loading Order ID: {order_id}", "info")
                     order_data = await self.api_service.post_data('/packing-station/start',
@@ -54,7 +59,7 @@ class BarcodeHandler(QObject):
                         self.log_signal.emit(f"Order ID: {order_id} loaded!", "success")
                         config_manager.set_order_id(order_id)
                         
-                        video_service.toggle_recording()
+                        video_service.start_recording()
                         set_status_label(1)
                         self.log_signal.emit(f"Start Recording (Order ID: {order_id})", "info")
                     else:
@@ -63,18 +68,8 @@ class BarcodeHandler(QObject):
                         self.log_signal.emit(f"Order ID: {order_id} not found!", "error")
                 except Exception as e:
                     print(f"Error fetching order data: {e}")
+                    self.log_signal.emit(f"Order ID: {order_id} | {order_data.get('message', 'Unknown error')}", "error")
                     statusBar.showMessage("Error fetching order data")
-                    if order_data.get('statusCode') == 400:
-                        self.log_signal.emit(f"Order ID: {order_id} not found!", "error")
-                        return
-                    if order_data.get('statusCode') == 403:
-                        self.log_signal.emit(f"Order ID: {order_id} already scanned!", "error")
-                        return
-                    if order_data.get('statusCode') == 404:
-                        self.log_signal.emit(f"Order ID: {order_id} not found!", "error")
-                        return
-                    else:
-                        self.log_signal.emit(f"Error fetching Order ID: {order_id}", "error")
             else:
                 print("Invalid order ID xwx")
                 statusBar.showMessage("Invalid order ID!")
@@ -84,8 +79,36 @@ class BarcodeHandler(QObject):
         elif barcode_text.startswith("end|"):
             _, order_id = barcode_text.split('|', 1)
             if order_id.isdigit():
+                if not config_manager.get_order_id():
+                    self.log_signal.emit(f"Error no OrderID load yet!", "error")
+                    return
                 try:
-                    video_service.toggle_recording()
+                    if listItemNotScaned.model().rowCount() > 0:
+                        msg_box = QMessageBox()
+                        msg_box.setIcon(QMessageBox.Warning)
+                        msg_box.setWindowTitle('Warning Unscanned Items Detected!')
+                        msg_box.setText('There are still items in the unscanned list. \nAre you sure you want to finish this order now?')
+                        msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+                        msg_box.setDefaultButton(QMessageBox.No)
+
+                        # Create a QTimer to close the dialog after 10 seconds
+                        timer = QTimer(msg_box)
+                        timer.setInterval(5000)  # 10 seconds
+                        timer.setSingleShot(True)
+                        timer.timeout.connect(msg_box.defaultButton().animateClick)
+                        timer.start()
+                        timer.timeout.connect(lambda: msg_box.done(QMessageBox.No))
+                        reply = msg_box.exec()
+
+                        if reply == QMessageBox.No:
+                            return
+                except Exception as e:
+                    self.log_signal.emit(f"Error: {order_id} | {e('message', 'Unknown error')}", "error")
+                    set_status_label(3)
+                    return
+                    
+                try:
+                    video_service.stop_recording()
                     self.log_signal.emit(f"Stopped recording (Order ID: {order_id})", "info")
                     video_file = video_service.get_last_recorded_video()  # Implement this method in VideoCaptureService
                     set_status_label(2)
@@ -103,13 +126,13 @@ class BarcodeHandler(QObject):
                     )
                     
                     if order_data:
-                        if order_data['status'] == '0':
+                        if order_data['statusCode'] == '0' or order_data['statusCode'] == 404:
                             print("Error sending order data")
                             statusBar.showMessage("Error sending order data")
                             set_status_label(3)
                             setup_order_list([], listItemScaned)
                             setup_order_list([], listItemNotScaned)
-                            self.log_signal.emit(f"Error sending Order ID: {order_id} data!", "error")
+                            self.log_signal.emit(f"Error sending Order ID: {order_id} | {order_data.get('message', 'Unknown error')}", "error")
                         else:
                             print("Order data sent successfully")
                             statusBar.showMessage("Order data sent successfully")
@@ -122,7 +145,7 @@ class BarcodeHandler(QObject):
                     print(f"Error sending order data: {e}")
                     statusBar.showMessage("Error sending order data")
                     set_status_label(3)
-                    self.log_signal.emit(f"Error sending Order ID: {order_id} data!", "error")            
+                    self.log_signal.emit(f"Error sending Order ID: {order_id}| {order_data.get('message', 'Unknown error')}", "error")     
         # Item Scan
         else:
             try:
