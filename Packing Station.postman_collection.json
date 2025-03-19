@@ -1,0 +1,700 @@
+{
+	"info": {
+		"_postman_id": "59e85aa9-1696-4868-ad60-1756534ece16",
+		"name": "Packing Station",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42756747"
+	},
+	"item": [
+		{
+			"name": "Items Get all",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/items/",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"items",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Item Get",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/items/6",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"items",
+						"6"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Item create",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "itemCode",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "Niko Plush",
+							"type": "text"
+						},
+						{
+							"key": "description",
+							"value": "High-performance plushy",
+							"type": "text"
+						},
+						{
+							"key": "price",
+							"value": "9999.99",
+							"type": "text"
+						},
+						{
+							"key": "quantity",
+							"value": "5",
+							"type": "text"
+						},
+						{
+							"key": "image",
+							"type": "file",
+							"src": []
+						},
+						{
+							"key": "createdUser",
+							"value": "1",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:3000/items/create",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"items",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Item update",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "itemCode",
+							"value": "Meowwwwww",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "Niko Plush",
+							"type": "text"
+						},
+						{
+							"key": "description",
+							"value": "High-performance plushy",
+							"type": "text"
+						},
+						{
+							"key": "price",
+							"value": "9999.999",
+							"type": "text"
+						},
+						{
+							"key": "quantity",
+							"value": "10",
+							"type": "text"
+						},
+						{
+							"key": "createdUser",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "image",
+							"type": "file",
+							"src": []
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:3000/items/6/update",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"items",
+						"6",
+						"update"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Item delete",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/items/3/delete",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"items",
+						"3",
+						"delete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "orders Get all",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/orders/",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"orders",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Order Get",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/orders/10",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"orders",
+						"10"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Order Get video",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/orders/2/record-video",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"orders",
+						"2",
+						"record-video"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Order create",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"customer\": \"Oneshot lover\",\r\n    \"trackingNumber\": \"THXXXXXXXXXX\",\r\n    \"status\": 1,\r\n    \"items\": [\r\n        {\r\n            \"itemId\": 1,\r\n            \"quantity\": 2\r\n        },\r\n        {\r\n            \"itemId\": 2,\r\n            \"quantity\": 1\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/orders/create",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"orders",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Order update",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"customer\": \"Oneshot lover\",\r\n    \"trackingNumber\": \"THXXXXXXXXXX\",\r\n    \"status\": 1,\r\n    \"items\": [\r\n        {\r\n            \"itemId\": 1,\r\n            \"quantity\": 1\r\n        },\r\n        {\r\n            \"itemId\": 2,\r\n            \"quantity\": 4\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/orders/2/update",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"orders",
+						"2",
+						"update"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Order update status",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"status\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/orders/2/set/status",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"orders",
+						"2",
+						"set",
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Order delete",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/orders/1/delete",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"orders",
+						"1",
+						"delete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Order Get Picking list PDF",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/orders/2/picking-list/",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"orders",
+						"2",
+						"picking-list",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "station heartbeat Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/packing-station/heartbeat",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"packing-station",
+						"heartbeat"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "station Barcode start",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"orderId\": \"2\",\r\n  \"station\": \"postman1\",\r\n  \"status\": \"1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/packing-station/start",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"packing-station",
+						"start"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "station Barcode restart",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"orderId\": \"2\",\r\n  \"station\": \"postman1\",\r\n  \"status\": \"1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/packing-station/restart",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"packing-station",
+						"restart"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "station Barcode end with video",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "orderId",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "status",
+							"value": "2",
+							"type": "text"
+						},
+						{
+							"key": "station",
+							"value": "postman1",
+							"type": "text"
+						},
+						{
+							"key": "video",
+							"type": "file",
+							"src": []
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:3000/packing-station/finish",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"packing-station",
+						"finish"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "station Barcode end (Error)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"orderId\": 3,\r\n    \"station\": \"postman1\",\r\n    \"status\": 0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/packing-station/finish",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"packing-station",
+						"finish"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "station Barcode scan item",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"orderId\": \"2\",\r\n  \"station\": \"postman1\",\r\n  \"itemCode\": \"PStaZovd\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/packing-station/item/",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"packing-station",
+						"item",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "station Barcode check item",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/packing-station/check/items/3",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"packing-station",
+						"check",
+						"items",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "station Barcode check order",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/packing-station/check/order/2",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"packing-station",
+						"check",
+						"order",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "station Del proof",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/packing-station/delete/60",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"packing-station",
+						"delete",
+						"60"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Packing Get all",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/packing/",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"packing",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Packing Get",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/packing/74",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"packing",
+						"74"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Packing mailling by ID",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/packing/106/mail/send",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"packing",
+						"106",
+						"mail",
+						"send"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Packing Del proof",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/packing/74/delete/",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"packing",
+						"74",
+						"delete",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

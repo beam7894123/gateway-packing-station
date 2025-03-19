@@ -1,10 +1,9 @@
 {
-  "name": "item_tracker",
-  "version": "0.0.1",
+  "name": "psg-api",
+  "version": "1.0.0",
   "description": "",
-  "author": "",
-  "private": true,
-  "license": "UNLICENSED",
+  "author": "BezaTheCat",
+  "license": "MIT",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
