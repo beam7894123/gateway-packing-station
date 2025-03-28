@@ -13,24 +13,40 @@ import { OrderSetStatusDto } from './dto/orders.setStatus.dto';
 @Injectable()
 export class OrdersService {
     constructor(private prisma: PrismaService) {}
+
+    async getAllOrders(req: Request, { status, createdAt, startDate, endDate }: { status?: string, createdAt?: string, startDate?: string, endDate?: string }) {
     
-    async getAllOrders (req: Request, { status, createdAt }: { status?: string, createdAt?: string }) {
-        let orders = await this.prisma.orders.findMany({
-          where: { isDeleted: 0 }
-        });
-
+        const whereClause: any = { isDeleted: 0 };
+    
         if (status) {
-            orders = orders.filter(order => order.status === parseInt(status));
+            whereClause.status = parseInt(status);
         }
-
+    
         if (createdAt) {
-            orders = orders.filter(order => order.createdAt.toISOString().startsWith(createdAt));
+            const date = new Date(createdAt);
+            whereClause.createdAt = {
+                gte: new Date(date.setHours(0, 0, 0, 0)),
+                lt: new Date(date.setHours(23, 59, 59, 999)),
+            };
+        }        
+    
+        if (startDate && endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            whereClause.createdAt = {
+                gte: new Date(start.setHours(0, 0, 0, 0)),
+                lte: new Date(end.setHours(23, 59, 59, 999)),
+            };
         }
-      
+    
+        // Fetch data with filters applied directly in the query
+        const orders = await this.prisma.orders.findMany({
+            where: whereClause
+        });
+    
         return orders
-      }
-      
-
+    }    
+    
     async getOrderById(id: number, req: Request) {
         const baseUrl = getBaseUrl(req);
         const order = await this.prisma.orders.findUnique({

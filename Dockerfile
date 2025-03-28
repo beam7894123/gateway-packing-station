@@ -3,9 +3,12 @@ FROM node:22
 # Set the working directory
 WORKDIR /usr/src/app
 
-# Install required dependencies for Puppeteer and Chromium
+# Install required dependencies for Puppeteer and Chromium, and Thai fonts
 RUN apt-get update && apt-get install -y \
-    chromium
+    chromium \
+    fonts-thai-tlwg \
+    --no-install-recommends && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set the environment variable to skip Chromium download in Puppeteer
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium

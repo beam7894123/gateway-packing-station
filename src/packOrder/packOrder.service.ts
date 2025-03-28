@@ -14,29 +14,46 @@ export class PackingOrderService {
     ) {} 
     
 
-    async getAllOrders(req: Request, { status, createdAt }: { status?: string, createdAt?: string }) {
+    async getAllOrders(req: Request, { status, createdAt, startDate, endDate }: { status?: string, createdAt?: string, startDate?: string, endDate?: string }) {
         const baseUrl = getBaseUrl(req);
-        let packing = await this.prisma.packing_proofs.findMany({
-            where: { isDeleted: 0 },
+    
+        const whereClause: any = { isDeleted: 0 };
+    
+        if (status) {
+            whereClause.status = parseInt(status);
+        }
+    
+        if (createdAt) {
+            const date = new Date(createdAt);
+            whereClause.createdAt = {
+                gte: new Date(date.setHours(0, 0, 0, 0)),
+                lt: new Date(date.setHours(23, 59, 59, 999)),
+            };
+        }        
+    
+        if (startDate && endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            whereClause.createdAt = {
+                gte: new Date(start.setHours(0, 0, 0, 0)),
+                lte: new Date(end.setHours(23, 59, 59, 999)),
+            };
+        }
+    
+        // Fetch data with filters applied directly in the query
+        const packing = await this.prisma.packing_proofs.findMany({
+            where: whereClause,
             include: {
                 order: true,
-            }
+            },
         });
-
-        if (status) {
-            packing = packing.filter(proof => proof.status === parseInt(status));
-        }
-
-        if (createdAt) {
-            packing = packing.filter(proof => proof.createdAt.toISOString().includes(createdAt));
-        }
-
+    
+        // Map the results to include the full video URL
         return packing.map(proof => ({
             ...proof,
-            video: proof.video ? `${baseUrl}${proof.video}` : null
+            video: proof.video ? `${baseUrl}${proof.video}` : null,
         }));
-        
-    }
+    }    
 
     async getOrderById(id: number, req: Request) {
         const baseUrl = getBaseUrl(req);

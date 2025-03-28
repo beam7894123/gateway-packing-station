@@ -20,7 +20,7 @@ services:
       - MAIL_USER=${MAIL_USER}
       - MAIL_PASSWORD=${MAIL_PASSWORD}
     volumes:
-      - PSG-API-Assets:/app/assets
+      - PSG-API-Assets:/usr/src/app/assets
     networks:
       - my-network
 
