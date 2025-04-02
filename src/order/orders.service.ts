@@ -80,6 +80,11 @@ export class OrdersService {
             },
             include: {
                 orderItems: {
+                  where: {
+                    item: {
+                        isDeleted: 0,
+                    },
+                },
                     include: {
                         item: true, // Include detailed information about each item
                     },
