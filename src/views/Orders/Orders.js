@@ -42,9 +42,11 @@ const Orders = () => {
   const [showModal, setShowModal] = useState(false)
   const [selectedItemId, setSelectedItemId] = useState(null)
   const [buttonLoading, setButtonLoading] = useState(false)
-  const [sortOrder, setSortOrder] = useState('asc') // State to manage sorting order
+  const [sortOrder, setSortOrder] = useState('desc') // State to manage sorting order
   const [statusFilter, setStatusFilter] = useState('') // State to manage status filter
-  const [dateFilter, setDateFilter] = useState('') // State to manage date filter
+  // const [dateFilter, setDateFilter] = useState('') // State to manage date filter
+  const [startDateFilter, setStartDateFilter] = useState('')
+  const [endDateFilter, setEndDateFilter] = useState('')
 
   const statusColors = {
     1: 'secondary', // received
@@ -65,21 +67,9 @@ const Orders = () => {
   }
 
   useEffect(() => {
-    apiService
-      .get('orders')
-      .then((response) => {
-        setItems(response.data)
-        setLoading(false)
-      })
-      .catch((error) => {
-        console.error('Error fetching items:', error)
-        setLoading(false)
-      })
-  }, [])
-
-  useEffect(() => {
     handleFilter()
-  }, [statusFilter, dateFilter])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statusFilter, startDateFilter, endDateFilter])
 
   const handlePrintPickingList = async (itemId) => {
     setButtonLoading(true)
@@ -144,35 +134,57 @@ const Orders = () => {
   }
 
   const handleSort = () => {
+    const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc'
     const sortedItems = [...items].sort((a, b) => {
-      if (sortOrder === 'asc') {
+      if (newSortOrder === 'asc') {
         return a.id - b.id
       } else {
         return b.id - a.id
       }
     })
     setItems(sortedItems)
-    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+    setSortOrder(newSortOrder)
   }
 
   const handleClearFilter = () => {
     setStatusFilter('')
-    setDateFilter('')
+    setStartDateFilter('')
+    setEndDateFilter('')
   }
 
   const handleFilter = () => {
+    setLoading(true)
+    const params = {
+      status: statusFilter || undefined,
+      startDate: startDateFilter || undefined,
+      endDate: endDateFilter || undefined,
+    }
+    // Remove undefined properties so they aren't sent as empty query params
+    Object.keys(params).forEach((key) => params[key] === undefined && delete params[key])
+
     apiService
       .get('orders', {
-        params: {
-          status: statusFilter,
-          createdAt: dateFilter,
-        },
+        params: params,
       })
       .then((response) => {
-        setItems(response.data)
+        let fetchedItems = response.data
+        fetchedItems.sort((a, b) => {
+          if (sortOrder === 'asc') {
+            return a.id - b.id
+          } else {
+            return b.id - a.id
+          }
+        })
+        setItems(fetchedItems)
+        setLoading(false)
       })
       .catch((error) => {
         console.error('Error fetching filtered items:', error)
+        dispatch({
+          type: 'addAlert',
+          alert: { type: 'danger', message: 'Error fetching orders!' },
+        })
+        setLoading(false)
       })
   }
 
@@ -202,6 +214,8 @@ const Orders = () => {
         </CCardBody>
       </CCard>
 
+      {/* Filter Column ------------------------------------------------------------ */}
+
       <CCard className="mb-4">
         <CCardBody>
           <div className="mb-3">
@@ -222,13 +236,20 @@ const Orders = () => {
                   <option value="6">Complete</option>
                 </CFormSelect>
               </CCol>
-              <CCol>
-                <CFormLabel className="me-2">Created Date:</CFormLabel>
+              <CCol md={3}>
+                <CFormLabel className="me-2">Start Date:</CFormLabel>
                 <CFormInput
                   type="date"
-                  className="me-2"
-                  value={dateFilter}
-                  onChange={(e) => setDateFilter(e.target.value)}
+                  value={startDateFilter}
+                  onChange={(e) => setStartDateFilter(e.target.value)}
+                />
+              </CCol>
+              <CCol md={3}>
+                <CFormLabel className="me-2">End Date:</CFormLabel>
+                <CFormInput
+                  type="date"
+                  value={endDateFilter}
+                  onChange={(e) => setEndDateFilter(e.target.value)}
                 />
               </CCol>
               <CCol xs="auto" className="mt-4">
@@ -252,7 +273,7 @@ const Orders = () => {
                   <CTableHeaderCell>Customer Name</CTableHeaderCell>
                   <CTableHeaderCell>Status</CTableHeaderCell>
                   <CTableHeaderCell>Tracking Number</CTableHeaderCell>
-                  <CTableHeaderCell>Created</CTableHeaderCell>
+                  <CTableHeaderCell>Order at</CTableHeaderCell>
                   <CTableHeaderCell></CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
