@@ -195,7 +195,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:3000/orders/",
+					"raw": "localhost:3000/orders/?startDate=2025-04-10&endDate=2025-04-20",
 					"host": [
 						"localhost"
 					],
@@ -203,6 +203,26 @@
 					"path": [
 						"orders",
 						""
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "0",
+							"disabled": true
+						},
+						{
+							"key": "createdAt",
+							"value": "2025-03-25",
+							"disabled": true
+						},
+						{
+							"key": "startDate",
+							"value": "2025-04-10"
+						},
+						{
+							"key": "endDate",
+							"value": "2025-04-20"
+						}
 					]
 				}
 			},
@@ -622,7 +642,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:3000/packing/",
+					"raw": "localhost:3000/packing/?startDate=2025-03-24&endDate=2025-03-27",
 					"host": [
 						"localhost"
 					],
@@ -630,6 +650,26 @@
 					"path": [
 						"packing",
 						""
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "0",
+							"disabled": true
+						},
+						{
+							"key": "createdAt",
+							"value": "2025-03-25",
+							"disabled": true
+						},
+						{
+							"key": "startDate",
+							"value": "2025-03-24"
+						},
+						{
+							"key": "endDate",
+							"value": "2025-03-27"
+						}
 					]
 				}
 			},
