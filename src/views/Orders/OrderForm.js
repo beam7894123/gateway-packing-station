@@ -20,9 +20,10 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
-  CImage,
+  CSpinner,
 } from '@coreui/react'
 import apiService from '../../services/ApiService.js'
+import ItemImage from '../../components/ItemImage.js'
 
 const OrderForm = () => {
   const { id } = useParams() // Get order ID (if editing)
@@ -41,37 +42,65 @@ const OrderForm = () => {
   const [allItems, setAllItems] = useState([])
   const [selectedItem, setSelectedItem] = useState({ itemId: '', quantity: 1 })
   const [showModal, setShowModal] = useState(false)
+  const [loadingOrder, setLoadingOrder] = useState(isEditMode)
+  const [loadingItems, setLoadingItems] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    if (isEditMode) {
-      apiService
-        .get(`orders/${id}`)
-        .then((res) => {
+    let isMounted = true
+    setError(null)
+
+    const fetchOrderData = async () => {
+      if (!isEditMode) {
+        setLoadingOrder(false)
+        return
+      }
+      setLoadingOrder(true)
+      try {
+        const res = await apiService.get(`orders/${id}`)
+        if (isMounted) {
           const data = res.data
+          // set safe defaults || '' and || []
           setFormData({
-            customer: data.customer,
-            customerEmail: data.customerEmail,
-            trackingNumber: data.trackingNumber,
-            status: data.status,
-            items: data.orderItems.map((item) => ({
+            customer: data.customer || '',
+            customerEmail: data.customerEmail || '',
+            trackingNumber: data.trackingNumber || '',
+            status: data.status || 1,
+            items: (data.orderItems || []).map((item) => ({
               itemId: item.itemId,
               quantity: item.quantity,
             })),
           })
-        })
-        .catch((error) => {
-          console.error('Error fetching order:', error)
-        })
+        }
+      } catch (err) {
+        console.error('Error fetching order:', err)
+        if (isMounted) setError('Failed to load order details.')
+      } finally {
+        if (isMounted) setLoadingOrder(false)
+      }
     }
 
-    apiService
-      .get('items')
-      .then((res) => {
-        setAllItems(res.data)
-      })
-      .catch((error) => {
-        console.error('Error fetching items:', error)
-      })
+    const fetchAllItems = async () => {
+      setLoadingItems(true)
+      try {
+        const res = await apiService.get('items')
+        if (isMounted) {
+          setAllItems(res.data || [])
+        }
+      } catch (err) {
+        console.error('Error fetching items:', err)
+        if (isMounted) setError('Failed to load available items.')
+      } finally {
+        if (isMounted) setLoadingItems(false)
+      }
+    }
+
+    fetchOrderData()
+    fetchAllItems()
+
+    return () => {
+      isMounted = false
+    }
   }, [id, isEditMode])
 
   const handleChange = (e) => {
@@ -162,6 +191,35 @@ const OrderForm = () => {
     } catch (error) {
       console.error('Error deleting order:', error)
     }
+  }
+
+  if (loadingOrder || loadingItems) {
+    return (
+      <CCard>
+        <CCardHeader>
+          <h2>{isEditMode ? `Loading Order ${id}...` : 'Loading Form...'}</h2>
+        </CCardHeader>
+        <CCardBody className="text-center p-5">
+          <CSpinner color="primary" />
+        </CCardBody>
+      </CCard>
+    )
+  }
+
+  if (error) {
+    return (
+      <CCard>
+        <CCardHeader>
+          <h2>Error</h2>
+        </CCardHeader>
+        <CCardBody>
+          <CAlert color="danger">{error}</CAlert>
+          <CButton color="secondary" onClick={() => navigate('/orders')}>
+            Back to Orders
+          </CButton>
+        </CCardBody>
+      </CCard>
+    )
   }
 
   return (
@@ -259,43 +317,68 @@ const OrderForm = () => {
                   <CTableHeaderCell></CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
+
               <CTableBody>
                 {formData.items.map((item, index) => {
-                  const itemDetails = allItems.find((i) => i.id === item.itemId)
+                  const itemDetails = allItems.find((i) => i && i.id === item.itemId) // Check i exists
+
+                  if (!itemDetails) {
+                    return (
+                      <CTableRow key={`missing-${index}`} style={{ opacity: 0.6 }}>
+                        <CTableDataCell colSpan={6}>
+                          <span className="text-danger">
+                            Item ID: {item.itemId} not found (may have been deleted).
+                          </span>
+                          <CButton
+                            color="danger"
+                            variant="outline"
+                            size="sm"
+                            className="float-end"
+                            onClick={() => handleRemoveItem(index)}
+                          >
+                            Remove Invalid Item
+                          </CButton>
+                        </CTableDataCell>
+                      </CTableRow>
+                    )
+                  }
+                  // --- END ADDED ---
+
+                  // If item details ARE found, render the normal row (this part is safe now)
+                  const lineTotal = (itemDetails.price || 0) * (item.quantity || 0)
                   return (
-                    <CTableRow key={index}>
+                    <CTableRow key={index} className="align-middle">
                       <CTableDataCell>
-                        {itemDetails.image ? (
-                          <CImage
-                            src={itemDetails?.image}
-                            alt={itemDetails?.name}
-                            width={80}
-                            height={80}
-                            style={{ objectFit: 'cover', borderRadius: '5px' }}
-                          />
-                        ) : (
-                          <CImage
-                            src="../images/404.png"
-                            alt={itemDetails?.image}
-                            width={80}
-                            height={80}
-                            style={{ objectFit: 'cover', borderRadius: '5px' }}
-                          />
-                        )}
+                        <ItemImage
+                          src={itemDetails.image} // Safe to access now
+                          alt={itemDetails.name || 'Item image'}
+                          width={60}
+                          height={60}
+                        />
                       </CTableDataCell>
-                      <CTableDataCell>{itemDetails?.name}</CTableDataCell>
-                      <CTableDataCell>{itemDetails?.price.toLocaleString()} baht</CTableDataCell>
+                      <CTableDataCell>{itemDetails.name}</CTableDataCell>
+                      <CTableDataCell>
+                        {(itemDetails.price || 0).toLocaleString()} Baht
+                      </CTableDataCell>
                       <CTableDataCell>
                         <CFormInput
                           type="number"
                           value={item.quantity}
                           onChange={(e) => handleQuantityChange(e, index)}
-                          min={1}
+                          min="1"
+                          style={{ maxWidth: '80px' }}
                         />
                       </CTableDataCell>
-                      <CTableDataCell>
-                        <CButton color="danger" size="sm" onClick={() => handleRemoveItem(index)}>
-                          Remove
+                      <CTableDataCell>{lineTotal.toLocaleString()} Baht</CTableDataCell>
+                      <CTableDataCell className="text-center">
+                        <CButton
+                          color="danger"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleRemoveItem(index)}
+                          title="Remove item"
+                        >
+                          X
                         </CButton>
                       </CTableDataCell>
                     </CTableRow>
