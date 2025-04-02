@@ -22,23 +22,47 @@ export class PackingOrderService {
         if (status) {
             whereClause.status = parseInt(status);
         }
-    
-        if (createdAt) {
-            const date = new Date(createdAt);
-            whereClause.createdAt = {
-                gte: new Date(date.setHours(0, 0, 0, 0)),
-                lt: new Date(date.setHours(23, 59, 59, 999)),
-            };
-        }        
-    
+
         if (startDate && endDate) {
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-            whereClause.createdAt = {
-                gte: new Date(start.setHours(0, 0, 0, 0)),
-                lte: new Date(end.setHours(23, 59, 59, 999)),
-            };
-        }
+            try {
+              const start = new Date(startDate);
+              const end = new Date(endDate);
+      
+              if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+                whereClause.createdAt = {
+                  gte: new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate(), 0, 0, 0, 0)), 
+                  lte: new Date(Date.UTC(end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate(), 23, 59, 59, 999)),
+                };
+              }
+            } catch (e) {
+               throw new Error('Invalid date range provided');
+            }
+      
+          } else if (startDate) {
+             try {
+              const date = new Date(startDate);
+               if (!isNaN(date.getTime())) {
+                whereClause.createdAt = {
+                  gte: new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 0, 0, 0, 0)),
+                  lte: new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 23, 59, 59, 999)),
+                };
+              }
+             } catch (e) {
+                throw new Error('Invalid start date provided');
+             }
+          } else if (createdAt) {
+            try {
+                const date = new Date(createdAt);
+                if (!isNaN(date.getTime())) {
+                    whereClause.createdAt = {
+                        gte: new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 0, 0, 0, 0)),
+                        lte: new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 23, 59, 59, 999)),
+                    };
+                }
+            } catch (e) {
+                throw new Error('Invalid createdAt date provided');
+            }
+        }      
     
         // Fetch data with filters applied directly in the query
         const packing = await this.prisma.packing_proofs.findMany({

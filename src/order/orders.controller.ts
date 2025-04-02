@@ -11,8 +11,11 @@ export class OrdersController {
   @Get('/')
     async getAllItems(@Req() req: Request,
       @Query('status') status?: string,
-      @Query('createdAt') createdAt?: string) {
-      return await this.ordersService.getAllOrders(req, { status, createdAt });
+      @Query('createdAt') createdAt?: string,
+      @Query('startDate') startDate?: string,
+      @Query('endDate') endDate?: string,
+    ) {
+      return await this.ordersService.getAllOrders(req, { status, createdAt, startDate, endDate });
     }  
 
   @Get(':id')
