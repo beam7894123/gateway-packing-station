@@ -44,7 +44,9 @@ const Packing = () => {
   const [showModalSendEmail, setShowModalSendEmail] = useState(false)
   const [selectedItemId, setSelectedItemId] = useState(null)
   const [statusFilter, setStatusFilter] = useState('')
-  const [dateFilter, setDateFilter] = useState('')
+  // const [dateFilter, setDateFilter] = useState('')
+  const [startDateFilter, setStartDateFilter] = useState('')
+  const [endDateFilter, setEndDateFilter] = useState('')
 
   const statusColors = {
     0: 'danger', // packing failed
@@ -61,38 +63,40 @@ const Packing = () => {
   }
 
   useEffect(() => {
-    apiService
-      .get('packing')
-      .then((response) => {
-        setItems(response.data)
-        setLoading(false)
-      })
-      .catch((error) => {
-        console.error('Error fetching items:', error)
-        setLoading(false)
-      })
-  }, [])
-
-  useEffect(() => {
     handleFilter()
-  }, [statusFilter, dateFilter])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statusFilter, startDateFilter, endDateFilter])
 
   const handleFilter = () => {
+    setLoading(true)
+    const params = {
+      status: statusFilter || undefined,
+      startDate: startDateFilter || undefined,
+      endDate: endDateFilter || undefined,
+    }
+
     apiService
       .get('packing', {
-        params: {
-          status: statusFilter,
-          createdAt: dateFilter,
-        },
+        params: params,
       })
       .then((response) => {
         setItems(response.data)
         setLoading(false)
       })
       .catch((error) => {
-        console.error('Error fetching filtered items:', error)
+        console.error('Error fetching filtered packing data:', error)
+        dispatch({
+          type: 'addAlert',
+          alert: { type: 'danger', message: 'Error fetching packing data!' },
+        })
         setLoading(false)
       })
+  }
+
+  const handleClearFilter = () => {
+    setStatusFilter('')
+    setStartDateFilter('')
+    setEndDateFilter('')
   }
 
   const handleViewVideo = (videoUrl) => {
@@ -176,23 +180,24 @@ const Packing = () => {
                   <option value="3">Email Sent</option>
                 </CFormSelect>
               </CCol>
-              <CCol>
-                <CFormLabel className="me-2">Packing Date:</CFormLabel>
+              <CCol md={3}>
+                <CFormLabel className="me-2">Start Date:</CFormLabel>
                 <CFormInput
                   type="date"
-                  className="me-2"
-                  value={dateFilter}
-                  onChange={(e) => setDateFilter(e.target.value)}
+                  value={startDateFilter}
+                  onChange={(e) => setStartDateFilter(e.target.value)}
+                />
+              </CCol>
+              <CCol md={3}>
+                <CFormLabel className="me-2">End Date:</CFormLabel>
+                <CFormInput
+                  type="date"
+                  value={endDateFilter}
+                  onChange={(e) => setEndDateFilter(e.target.value)}
                 />
               </CCol>
               <CCol xs="auto" className="mt-4">
-                <CButton
-                  color="secondary"
-                  onClick={() => {
-                    setStatusFilter('')
-                    setDateFilter('')
-                  }}
-                >
+                <CButton color="secondary" onClick={handleClearFilter}>
                   Clear
                 </CButton>
               </CCol>

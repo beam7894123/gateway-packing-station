@@ -25,6 +25,7 @@ import {
 import { useNavigate } from 'react-router-dom'
 import apiService from '../../services/ApiService.js'
 import { useDispatch } from 'react-redux'
+import ItemImage from '../../components/ItemImage'
 
 const Items = () => {
   const navigate = useNavigate()
@@ -111,23 +112,12 @@ const Items = () => {
                 {items.map((item, index) => (
                   <CTableRow key={item.id}>
                     <CTableDataCell>
-                      {item.image ? (
-                        <CImage
-                          src={item.image}
-                          alt={item.name}
-                          width={100}
-                          height={100}
-                          style={{ objectFit: 'cover', borderRadius: '5px' }}
-                        />
-                      ) : (
-                        <CImage
-                          src="../images/404.png"
-                          alt={item.name}
-                          width={100}
-                          height={100}
-                          style={{ objectFit: 'cover', borderRadius: '5px' }}
-                        />
-                      )}
+                      <ItemImage
+                        src={item.image}
+                        alt={item.name || 'Item image'}
+                        width={100}
+                        height={100}
+                      />
                     </CTableDataCell>
                     <CTableDataCell>{item.name}</CTableDataCell>
                     <CTableDataCell>{item.price.toLocaleString()} baht</CTableDataCell>
